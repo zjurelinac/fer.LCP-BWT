@@ -12,10 +12,12 @@ namespace lb {
         using symbol_type = lb::sequence::value_type;
     public:
         alphabet(const lb::sequence& text);
-        std::size_t size();
-        int operator[](int index) const;
+        char operator[](int index) const;
+        int csum(int index) const;
+        std::size_t size() const;
     private:
-        std::unordered_map<symbol_type, int> csum;
+        std::unordered_map<symbol_type, int> mapping;
+        std::unordered_map<symbol_type, int> cs;
     };
 }
 
