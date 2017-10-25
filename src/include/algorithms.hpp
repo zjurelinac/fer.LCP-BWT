@@ -1,15 +1,14 @@
-#ifndef _ALGORITHMS_HPP
-#define _ALGORITHMS_HPP
+#ifndef _ALGORITHMS_HPP_
+#define _ALGORITHMS_HPP_
 
-#include <string>
+#include "base.hpp"
+#include "alphabet.hpp"
 
-#include <sdsl/wavelet_trees.hpp>
-
-namespace lb{
-    using sequence = std::string;
-    using wtree = sdsl::wt_blcd<>;
-
-    sequence build_bwt(sequence in);
-    wtree build_wtree(sequence bwt);
+namespace lb {
+    alphabet build_alphabet(const sequence& in);
+    sequence build_bwt(const sequence& in);
+    wtree build_wtree(const sequence& bwt);
+    intervals get_intervals(interval start, lb::alphabet& a, lb::wtree& wtree);
 }
-#endif
+
+#endif  // _ALGORITHMS_HPP_

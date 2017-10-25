@@ -10,6 +10,7 @@ void output_results(char* output_file, std::vector<int> LCP);
 
 int main(int argc, char* argv[]) {
     lb::sequence T {"ananas$"};
+    lb::alphabet A = lb::build_alphabet(T);
     lb::sequence BWT = lb::build_bwt(T);
     lb::wtree WT = lb::build_wtree(BWT);
 
@@ -21,7 +22,7 @@ int main(int argc, char* argv[]) {
 void output_results(char* output_file, std::vector<int> LCP) {
     std::ofstream ofs(output_file, std::ofstream::out);
     ofs << "[";
-    for (auto x : LCP)
+    for (auto& x : LCP)
         ofs << x << ',';
     ofs << "]\n";
     ofs.close();
