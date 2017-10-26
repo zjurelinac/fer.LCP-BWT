@@ -17,7 +17,7 @@ lb::sequence lb::build_bwt(const lb::sequence& in) {
     return bwt;
 }
 
-lb::wtree lb::build_wtree(const lb::sequence& bwt) {
+lb::wtree lb::build_wtree(const lb::sequence& bwt, const lb::alphabet &a) {
     wtree wt;
     sdsl::construct_im(wt, bwt, 1);
     return wt;

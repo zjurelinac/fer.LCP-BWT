@@ -11,10 +11,12 @@
 
 namespace lb {
     using sequence = std::string;
-    using wtree = sdsl::wt_blcd<>;
     using alpha_interval = std::pair<unsigned char, unsigned char>;
     using interval = std::pair<int, int>;
     using intervals = std::vector<interval>;
+#ifdef USE_SDSL_WTREE
+    using wtree = sdsl::wt_blcd<>;
+#endif
 }
 
 #endif  // _BASE_HPP_ 

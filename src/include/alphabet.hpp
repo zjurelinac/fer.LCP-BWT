@@ -21,4 +21,4 @@ namespace lb {
     };
 }
 
-#endif  // _ALPHABET_HPP
+#endif  // _ALPHABET_HPP_

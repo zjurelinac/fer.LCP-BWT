@@ -21,8 +21,7 @@ int main(int argc, char* argv[]) {
     // Generating random input file
     int N = atoi(argv[1]);
     char alpha[] = "ACGT";
-    std::string genome;
-    genome.resize(N + 1);
+    std::string genome(N + 1, '\0');
     genome[N] = '$';
     
     std::ofstream ifs(argv[2], std::ofstream::out);    
@@ -39,16 +38,15 @@ int main(int argc, char* argv[]) {
     ifs.close();
 
     // Generating expected output file
-    std::vector<int> sa;
+    std::vector<int> sa(N + 1, 0);
     for (auto i = 0; i < N + 1; ++i)
-        sa.push_back(i);
+        sa[i] = i;
 
     std::sort(sa.begin(), sa.end(), [genome](auto i, auto j) {return genome.substr(i) < genome.substr(j);});
 
-    std::vector<int> lcp;
-    lcp.push_back(-1);
+    std::vector<int> lcp(N + 1, -1);
     for (auto i = 1; i < N + 1; ++i)
-        lcp.push_back(common_prefix(genome.substr(sa[i]).c_str(), genome.substr(sa[i - 1]).c_str()));
+        lcp[i] = common_prefix(genome.substr(sa[i]).c_str(), genome.substr(sa[i - 1]).c_str());
     
     output_results(argv[3], lcp);
 }

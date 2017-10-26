@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     lb::sequence T {"ananas$"};
     lb::alphabet A {T};
     lb::sequence BWT = lb::build_bwt(T);
-    lb::wtree WT = lb::build_wtree(BWT);
+    lb::wtree WT = lb::build_wtree(BWT, A);
 
     for (int i = 0; i < A.size(); ++i)
         std::cout << A[i] << " " << A.csum(i) << "\n";

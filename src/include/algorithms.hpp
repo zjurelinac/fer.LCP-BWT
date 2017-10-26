@@ -5,10 +5,9 @@
 #include "alphabet.hpp"
 
 namespace lb {
-    //alphabet build_alphabet(const sequence& in);
     sequence build_bwt(const sequence& in);
-    wtree build_wtree(const sequence& bwt);
-    intervals get_intervals(interval start, lb::alphabet& a, lb::wtree& wtree);
+    wtree build_wtree(const sequence& bwt, const alphabet& a);
+    intervals get_intervals(interval start, alphabet& a, wtree& wtree);
 }
 
 #endif  // _ALGORITHMS_HPP_
