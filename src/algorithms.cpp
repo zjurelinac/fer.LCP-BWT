@@ -3,7 +3,15 @@
 #include "sais.hpp"
 #include "algorithms.hpp"
 
-static void _get_intervals(lb::interval, lb::alpha_interval, lb::intervals&, const lb::alphabet&, const lb::wtree&);
+
+static void get_intervals_(lb::interval start, lb::alpha_interval alpha, lb::intervals& list, const lb::alphabet& a, const lb::wtree& wtree) {
+    if (alpha.first == alpha.second) {
+        auto C = a.csum(alpha.first);
+        list.push_back(lb::interval(C + start.first, C + start.second));
+    } else {
+
+    }
+}
 
 lb::sequence lb::build_bwt(const lb::sequence& in) {
     sequence bwt;
@@ -36,15 +44,13 @@ lb::wtree lb::build_wtree(const lb::sequence& bwt, const lb::alphabet &a) {
 
 lb::intervals lb::get_intervals(lb::interval start, const lb::alphabet& a, const lb::wtree& wt) {
     intervals list;
-    _get_intervals(start, alpha_interval(0, a.size() - 1), list, a, wt);
+    get_intervals_(start, alpha_interval(0, a.size() - 1), list, a, wt);
     return list;
 }
 
-static void _get_intervals(lb::interval start, lb::alpha_interval alpha, lb::intervals& list, const lb::alphabet& a, const lb::wtree& wtree) {
-    if (alpha.first == alpha.second) {
-        auto C = a.csum(alpha.first);
-        list.push_back(lb::interval(C + start.first, C + start.second));
-    } else {
+lb::lcp_array lb::build_lcp(const wtree& wt) {
+    lcp_array lcp(wt.size(), -1);
+    // TODO: @Zivec
 
-    }
+    return lcp;
 }

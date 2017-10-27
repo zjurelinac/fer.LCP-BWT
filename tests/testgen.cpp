@@ -13,8 +13,7 @@ void output_results(char* output_file, std::vector<int> LCP);
 
 int main(int argc, char* argv[]) {
     if(argc != 4) {
-        std::cout << "Wrong number of parameters\n"
-        "Usage: ./testgen test_size input_file output_file\n";
+        std::cout << "Usage: testgen test_size input_file output_file\n";
         return -1;
     }
 
@@ -23,9 +22,9 @@ int main(int argc, char* argv[]) {
     char alpha[] = "ACGT";
     std::string genome(N + 1, '\0');
     genome[N] = '$';
-    
-    std::ofstream ifs(argv[2], std::ofstream::out);    
-    
+
+    std::ofstream ifs(argv[2], std::ofstream::out);
+
     ifs << ">Ex. temere, genome length = " << N;
 
     srand(time(NULL));
@@ -34,12 +33,12 @@ int main(int argc, char* argv[]) {
             ifs << std::endl;
         ifs << (genome[i] = alpha[rand() % 4]);
     }
-    
+
     ifs.close();
 
     // Generating expected output file
     std::vector<int> sa(N + 1, 0);
-    for (auto i = 0; i < N + 1; ++i)
+    for (auto i = 0u; i < N + 1; ++i)
         sa[i] = i;
 
     std::sort(sa.begin(), sa.end(), [genome](auto i, auto j) {return genome.substr(i) < genome.substr(j);});
@@ -47,7 +46,7 @@ int main(int argc, char* argv[]) {
     std::vector<int> lcp(N + 1, -1);
     for (auto i = 1; i < N + 1; ++i)
         lcp[i] = common_prefix(genome.substr(sa[i]).c_str(), genome.substr(sa[i - 1]).c_str());
-    
+
     output_results(argv[3], lcp);
 }
 

@@ -1,13 +1,20 @@
 #include "wavelet_tree.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <queue>
+#include <string>
 #include <utility>
 
 #include "base.hpp"
 
-lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) {
+
+static inline int binary_rank(lb::bitvector bv, lb::bitvector::value_type bit, std::size_t index) {
+    return std::count(bv.begin(), bv.begin() + index, bit);
+}
+
+lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : a(a), sz(in.size()) {
     using subseq = std::pair<sequence::iterator, sequence::iterator>;
     using tmp_node = std::pair<alpha_interval, subseq>;
 
@@ -21,17 +28,70 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) {
         auto range = curr.second;
 
         auto mid = (alpha.first + alpha.second) / 2;
-        auto chr = a[mid];
-        std::stable_partition(range.first, range.second, [chr](auto x){ return x <= chr; });
-        auto bound = std::upper_bound(range.first, range.second, chr);
+        auto chr = a[(std::size_t) mid];
+
+        //std::cout << alpha <<  ": splitting at " << chr << "\n";
 
         bitvector bv(range.second - range.first, false);
         std::transform(range.first, range.second, bv.begin(), [chr](auto x){ return x > chr; });
+
+        std::stable_partition(range.first, range.second, [chr](auto x){ return x <= chr; });
+        auto bound = std::upper_bound(range.first, range.second, chr);
+        //std::cout << bv << "\n";
         nodes.push_back(bv);
 
         if (alpha.second - alpha.first > 1) {
             workspace.push(tmp_node(alpha_interval(alpha.first, mid), subseq(range.first, bound)));
             workspace.push(tmp_node(alpha_interval(mid + 1, alpha.second), subseq(bound, range.second)));
+        }
+    }
+}
+
+lb::wavelet_tree::wavelet_tree(const wavelet_tree& wt) : a(wt.a), sz(wt.sz), nodes(wt.nodes) {}
+
+int lb::wavelet_tree::rank(std::size_t index, symbol_type symbol) const {
+    const int N = nodes.size();
+    int curr = 0, symbol_index = a[(symbol_type)symbol];
+    std::cout << "Finding rank of " << (char) symbol << "[" << symbol_index << "] till " << index << "\n";
+
+    alpha_interval alpha = alpha_interval(0, a.size() - 1);
+    while (curr < N) {
+        std::cout << "Searching for rank @" << curr << ", " << alpha << "\n";
+        auto mid = (alpha.first + alpha.second) / 2;
+        bitvector::value_type bit = symbol_index > mid;
+        index = binary_rank(nodes[curr], bit, index);
+        if (!bit) {
+            curr = 2*curr + 1;
+            alpha = alpha_interval(alpha.first, mid);
+        } else {
+            curr = 2*curr + 2;
+            alpha = alpha_interval(mid + 1, alpha.second);
+        }
+    }
+
+    return index;
+}
+
+std::size_t lb::wavelet_tree::size() const {
+    return sz;
+}
+
+static std::string indent(int n) {
+    std::string s = "";
+    for (auto i = 0; i < n; ++i )
+        s += " ";
+}
+
+void lb::wavelet_tree::show() const {
+    using nd = std::pair<int, int>;
+    std::queue<nd> Q;
+    Q.push(nd(0, 0));
+    while (!Q.empty()) {
+        nd c = Q.front(); Q.pop();
+        if (c.first < nodes.size()) {
+            Q.push(nd(2*c.first + 1, c.second + 1));
+            Q.push(nd(2*c.first + 2, c.second + 1));
+            std::cout << c.first << ":" << indent(c.second * 2) << " " << nodes[c.first] << "\n";
         }
     }
 }

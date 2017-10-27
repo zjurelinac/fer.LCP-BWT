@@ -1,5 +1,5 @@
 CXX = g++
-CFLAGS = -std=c++14 -O3 -Wall -Wextra -Wno-char-subscripts -I./src/include -DDEBUG# -DUSE_SDSL_WTREE
+CFLAGS = -std=c++14 -g -O3 -Wall -Wextra -Wno-char-subscripts -I./src/include -DDEBUG# -DUSE_SDSL_WTREE
 LDFLAGS = -lsdsl -ldivsufsort
 
 SDIR = src

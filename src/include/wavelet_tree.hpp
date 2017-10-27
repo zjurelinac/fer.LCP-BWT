@@ -1,6 +1,7 @@
 #ifndef _WAVELET_TREE_HPP_
 #define _WAVELET_TREE_HPP_
 
+#include <cstddef>
 #include <vector>
 
 #include "base.hpp"
@@ -8,11 +9,20 @@
 
 namespace lb {
     class wavelet_tree {
+        using symbol_type = lb::sequence::value_type;
     public:
+        wavelet_tree();
         wavelet_tree(const lb::sequence& in, const lb::alphabet& a);
-        int rank();
+        wavelet_tree(const wavelet_tree& wt);
+        wavelet_tree(wavelet_tree&& wt);                        // TODO: @Tonko
+        symbol_type operator[](std::size_t index) const;        // TODO: @Tonko
+        int rank(std::size_t index, symbol_type symbol) const;
+        int select(std::size_t num, symbol_type symbol) const;  // TODO: @Tonko
+        std::size_t size() const;
+        void show() const;
     private:
-        alphabet a;
+        const lb::alphabet& a;
+        std::size_t sz;
         std::vector<bitvector> nodes;
     };
 
