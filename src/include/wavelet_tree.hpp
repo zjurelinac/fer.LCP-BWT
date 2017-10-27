@@ -3,14 +3,17 @@
 
 #include <vector>
 
+#include "base.hpp"
+#include "alphabet.hpp"
+
 namespace lb {
     class wavelet_tree {
     public:
-        wavelet_tree(const sequence& in, const alphabet& a);
+        wavelet_tree(const lb::sequence& in, const lb::alphabet& a);
         int rank();
     private:
         alphabet a;
-
+        std::vector<bitvector> nodes;
     };
 
 #ifndef USE_SDSL_WTREE

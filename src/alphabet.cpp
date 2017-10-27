@@ -1,5 +1,7 @@
 #include "alphabet.hpp"
 
+lb::alphabet::alphabet() {}
+
 lb::alphabet::alphabet(const lb::sequence& text) {
     std::map<symbol_type, int> cnt;
     for (auto& c : text) ++cnt[c];
@@ -9,8 +11,10 @@ lb::alphabet::alphabet(const lb::sequence& text) {
         mapping[tindex] = it.first;
         cs[tindex++] = tsum;
         tsum += it.second;
-    }    
+    }
 }
+
+lb::alphabet::alphabet(const lb::alphabet& a) : mapping(a.mapping), cs(a.cs) {}
 
 char lb::alphabet::operator[](int index) const {
     return mapping.find(index)->second;

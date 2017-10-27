@@ -11,7 +11,9 @@ namespace lb {
     class alphabet {
         using symbol_type = lb::sequence::value_type;
     public:
+        alphabet();
         alphabet(const lb::sequence& text);
+        alphabet(const alphabet& a);
         char operator[](int index) const;
         int csum(int index) const;
         std::size_t size() const;

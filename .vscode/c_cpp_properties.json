@@ -34,6 +34,7 @@
                 "/usr/include",
                 "/usr/include/x86_64-linux-gnu",
                 "${workspaceRoot}",
+                "${workspaceRoot}/src",
                 "${workspaceRoot}/src/include"
             ],
             "defines": [],
@@ -47,6 +48,7 @@
                     "/usr/include",
                     "/usr/include/x86_64-linux-gnu",
                     "${workspaceRoot}",
+                    "${workspaceRoot}/src",
                     "${workspaceRoot}/src/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
