@@ -35,3 +35,22 @@ void output_results(char* output_file, std::vector<int> LCP) {
     ofs << "]\n";
     ofs.close();
 }
+
+std::string parse_input(char* input_file){
+    std::string input, temp;
+    std::ifstream file(input_file);
+
+    if (!file) {
+        std::cerr << "Unable to open file" <<std::endl;
+        exit(1);
+    }
+
+    std::getline(file, temp); // first line
+
+    while(!file.eof()){
+        std::getline(file, temp);
+        input += temp;
+    }
+    file.close();
+    return input;
+}
