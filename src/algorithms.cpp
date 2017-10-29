@@ -1,4 +1,5 @@
 #include <map>
+#include <queue>
 
 #include "sais.hpp"
 #include "algorithms.hpp"
@@ -49,8 +50,25 @@ lb::intervals lb::get_intervals(lb::interval start, const lb::alphabet& a, const
 }
 
 lb::lcp_array lb::build_lcp(const wtree& wt) {
-    lcp_array lcp(wt.size(), -1);
+    const int size = wt.size();
+    lcp_array lcp(size, -10);
     // TODO: @Zivec
+    lb::alphabet alphabet = lb::alphabet();
+    lcp[0] = -1;
+    lcp[size] = -1;
+    queue<pair<intervals, int>> queue;
+    queue.push(make_pair(make_pair(1, size), 0));
 
+    while(!queue.empty()){
+        auto dequeue_element = queue.front();
+        queue.pop();
+        intervals list = get_intervals(dequeue_element.first(), alphabet, wt);
+        for(auto interval : list){
+            if(lcp[interval.second()] == -10){
+                queue.push(make_pair(interval, dequeue_element.second()+1);
+                lcp[interval.second()+1] = dequeue_element.second();
+            }
+        }
+    }
     return lcp;
 }
