@@ -19,18 +19,18 @@ lb::alphabet::alphabet(const lb::alphabet& a) : map(a.map), rmap(a.rmap), cs(a.c
 
 lb::alphabet::alphabet(alphabet&& a) : map(std::move(a.map)), rmap(std::move(a.rmap)), cs(std::move(a.cs)) {}
 
-lb::alphabet::symbol_type lb::alphabet::operator[](std::size_t index) const {
+lb::symbol_type lb::alphabet::operator[](lb::size_t index) const {
     return rmap.find(index)->second;
 }
 
-std::size_t lb::alphabet::operator[](lb::alphabet::symbol_type symbol) const {
+lb::size_t lb::alphabet::operator[](lb::symbol_type symbol) const {
     return map.find(symbol)->second;
 }
 
-int lb::alphabet::csum(std::size_t index) const {
+int lb::alphabet::csum(lb::size_t index) const {
     return cs.find(index)->second;
 }
 
-std::size_t lb::alphabet::size() const {
+lb::size_t lb::alphabet::size() const {
     return map.size();
 }

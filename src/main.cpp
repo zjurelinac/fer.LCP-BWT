@@ -17,13 +17,17 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    lb::sequence T {"ananas$"};
+    lb::sequence T {"ananas$"}; //{"el_anele_lepanelen$"};
     lb::alphabet A {T};
     lb::sequence BWT = lb::build_bwt(T);
 
     std::cout << BWT << "\n";
 
     lb::wtree WT = lb::build_wtree(BWT, A);
+
+    lb::intervals ints = lb::get_intervals(lb::interval(1, 3), A, WT);
+    std::cout << ints.size() << ": " << ints << "\n";
+
     lb::lcp_array LCP = lb::build_lcp(WT);
     output_results(argv[2], LCP);
 }

@@ -1,7 +1,6 @@
 #include "wavelet_tree.hpp"
 
 #include <algorithm>
-#include <cstddef>
 #include <iostream>
 #include <queue>
 #include <string>
@@ -10,7 +9,7 @@
 #include "base.hpp"
 
 
-static inline int binary_rank(lb::bitvector bv, lb::bitvector::value_type bit, std::size_t index) {
+static inline lb::size_t binary_rank(lb::bitvector bv, lb::bitvector::value_type bit, lb::size_t index) {
     return std::count(bv.begin(), bv.begin() + index, bit);
 }
 
@@ -28,16 +27,13 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
         auto range = curr.second;
 
         auto mid = (alpha.first + alpha.second) / 2;
-        auto chr = a[(std::size_t) mid];
-
-        //std::cout << alpha <<  ": splitting at " << chr << "\n";
+        auto chr = a[(lb::size_t) mid];
 
         bitvector bv(range.second - range.first, false);
         std::transform(range.first, range.second, bv.begin(), [chr](auto x){ return x > chr; });
 
         std::stable_partition(range.first, range.second, [chr](auto x){ return x <= chr; });
         auto bound = std::upper_bound(range.first, range.second, chr);
-        //std::cout << bv << "\n";
         nodes.push_back(bv);
 
         if (alpha.second - alpha.first > 1) {
@@ -49,7 +45,12 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
 
 lb::wavelet_tree::wavelet_tree(const wavelet_tree& wt) : a(wt.a), sz(wt.sz), nodes(wt.nodes) {}
 
-int lb::wavelet_tree::rank(std::size_t index, symbol_type symbol) const {
+lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bool bit) const {
+    return interval(binary_rank(nodes[node], bit, range.first),
+                    binary_rank(nodes[node], bit, range.second + 1));
+}
+
+lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) const {
     const int N = nodes.size();
     int curr = 0, symbol_index = a[(symbol_type)symbol];
     std::cout << "Finding rank of " << (char) symbol << "[" << symbol_index << "] till " << index << "\n";
@@ -72,18 +73,19 @@ int lb::wavelet_tree::rank(std::size_t index, symbol_type symbol) const {
     return index;
 }
 
-std::size_t lb::wavelet_tree::size() const {
+lb::size_t lb::wavelet_tree::size() const {
     return sz;
 }
 
-static std::string indent(int n) {
+/*static std::string indent(int n) {
     std::string s = "";
     for (auto i = 0; i < n; ++i )
         s += " ";
+    return s;
 }
 
 void lb::wavelet_tree::show() const {
-    using nd = std::pair<int, int>;
+    using nd = std::pair<unsigned int, unsigned int>;
     std::queue<nd> Q;
     Q.push(nd(0, 0));
     while (!Q.empty()) {
@@ -94,4 +96,4 @@ void lb::wavelet_tree::show() const {
             std::cout << c.first << ":" << indent(c.second * 2) << " " << nodes[c.first] << "\n";
         }
     }
-}
+}*/
