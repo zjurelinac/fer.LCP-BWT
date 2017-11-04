@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -8,8 +9,8 @@
 #include "wavelet_tree.hpp"
 #endif
 
-std::string parse_input(char* input_file);
-void output_results(char* output_file, lb::lcp_array& LCP);
+lb::sequence parse_input(const char* input_file);
+void output_results(const char* output_file, lb::lcp_array& LCP);
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -17,27 +18,21 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    lb::sequence T {"ananas$"}; //{"el_anele_lepanelen$"};
+    lb::sequence T = parse_input(argv[1]);
     lb::alphabet A {T};
     lb::sequence BWT = lb::build_bwt(T);
-
-    std::cout << BWT << "\n";
-
     lb::wtree WT = lb::build_wtree(BWT, A);
+    lb::lcp_array LCP = lb::build_lcp(WT, A);
 
-    lb::intervals ints = lb::get_intervals(lb::interval(1, 3), A, WT);
-    std::cout << ints.size() << ": " << ints << "\n";
-
-    lb::lcp_array LCP = lb::build_lcp(WT);
     output_results(argv[2], LCP);
 }
 
-std::string parse_input(char* input_file) {
-    std::string input, temp;
+lb::sequence parse_input(const char* input_file) {
+    lb::sequence input, temp;
     std::ifstream file(input_file);
 
     if (!file) {
-        std::cerr << "Unable to open file\n";
+        std::cerr << "Unable to open file: " << input_file << " \n";
         exit(1);
     }
 
@@ -47,14 +42,14 @@ std::string parse_input(char* input_file) {
         input += temp;
     }
     file.close();
-    return input;
+    return input + '$';
 }
 
-void output_results(char* output_file, lb::lcp_array& lcp) {
-    std::ofstream ofs(output_file, std::ofstream::out);
+void output_results(const char* output_file, lb::lcp_array& lcp) {
+    std::ofstream ofs(output_file);
     ofs << "[";
     for (auto i = 0u; i < lcp.size(); ++i)
-        ofs << lcp[i] << ((i != lcp.size() - 1) ? "," : "");
+        ofs << (int) lcp[i] << ((i != lcp.size() - 1) ? "," : "");
     ofs << "]\n";
     ofs.close();
 }

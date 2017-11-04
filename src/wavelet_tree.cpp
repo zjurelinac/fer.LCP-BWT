@@ -46,8 +46,9 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
 lb::wavelet_tree::wavelet_tree(const wavelet_tree& wt) : a(wt.a), sz(wt.sz), nodes(wt.nodes) {}
 
 lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bool bit) const {
-    return interval(binary_rank(nodes[node], bit, range.first),
-                    binary_rank(nodes[node], bit, range.second + 1));
+    auto left = range.first > 0 ? binary_rank(nodes[node], bit, range.first) : 0;
+    auto right = binary_rank(nodes[node], bit, range.second + 1);
+    return interval(left, right);
 }
 
 lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) const {
@@ -93,7 +94,7 @@ void lb::wavelet_tree::show() const {
         if (c.first < nodes.size()) {
             Q.push(nd(2*c.first + 1, c.second + 1));
             Q.push(nd(2*c.first + 2, c.second + 1));
-            std::cout << c.first << ":" << indent(c.second * 2) << " " << nodes[c.first] << "\n";
+            std::cout << "[" << c.first << "]:" << indent(c.second * 2) << " " << nodes[c.first];
         }
     }
 }*/

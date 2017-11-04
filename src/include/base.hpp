@@ -9,30 +9,24 @@
 #include <utility>
 #include <vector>
 
-#ifdef USE_SDSL_WTREE
-    #include <sdsl/wavelet_trees.hpp>
-#endif
 
 namespace lb {
-    using uint8 = unsigned char;
-    using size_t = std::size_t;
+    using int8 = signed char;
+    using size_t = unsigned int;
     using bitvector = std::vector<bool>;
     using sequence = std::string;
     using symbol_type = sequence::value_type;
-    using alpha_interval = std::pair<short, short>;         // TODO: switch back to uint8
+    using alpha_interval = std::pair<int8, int8>;
     using interval = std::pair<lb::size_t, lb::size_t>;
     using intervals = std::vector<interval>;
-    using lcp_array = std::vector<uint8>;
-#ifdef USE_SDSL_WTREE
-    using wtree = sdsl::wt_blcd<>;
-#endif
+    using lcp_array = std::vector<int8>;
 }
 
 #ifdef DEBUG
 
 template <typename A, typename B>
 std::ostream &operator<<(std::ostream &os, std::pair<A, B> p) {
-    return os << "<" << p.first << ", " << p.second << ">";
+    return os << "[" << p.first << ", " << p.second << "]";
 }
 
 template <typename A, typename B, typename C>

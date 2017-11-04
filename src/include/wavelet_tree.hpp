@@ -25,9 +25,7 @@ namespace lb {
         std::vector<bitvector> nodes;
     };
 
-#ifndef USE_SDSL_WTREE
     using wtree = wavelet_tree;
-#endif
 }
 
 #endif  // _WAVELET_TREE_HPP_
