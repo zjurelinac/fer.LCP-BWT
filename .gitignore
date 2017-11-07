@@ -36,3 +36,5 @@ cmp
 out
 
 tags
+gmon.out
+profiling_*.txt

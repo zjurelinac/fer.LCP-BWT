@@ -3,6 +3,7 @@
 import argparse
 import glob
 import os
+import resource
 import subprocess
 
 
@@ -55,8 +56,7 @@ def run_tests():
         test_path = os.path.join(TESTS_PATH, test_name)
         test_out = os.path.join(TESTS_OUT_DIR, test_name) + '.out'
         test_in, test_exp = test_path + '.in', test_path + '.out'
-        params = [EXEC_PATH, test_in, test_out]
-        subprocess.run(params, check=True)
+        subprocess.run([EXEC_PATH, test_in, test_out], check=True)
         result = cmp_files(test_out, test_exp)
         results.append(result)
         print(test_name, "->", 'OK' if result else 'WRONG!')
@@ -66,10 +66,29 @@ def run_tests():
     print('Results: %d/%d tests passed, %d%%\n' % (c, n, 100 * (c/n if n else 1)))
 
 
+def run_analysis(test_case):
+    print('\nRunning analysis...')
+    print('=' * 40)
+
+    print('Starting program.')
+    test_in = os.path.join(TESTS_PATH, test_case) + '.in'
+    test_out = os.path.join(TESTS_OUT_DIR, test_case) + '.out'
+    subprocess.run([EXEC_PATH, test_in, test_out], check=True)
+    rusage = resource.getrusage(resource.RUSAGE_CHILDREN)
+    print('Program execution completed.')
+    print('-' * 40)
+
+    print('User time ::', rusage.ru_utime)
+    print('System time ::', rusage.ru_stime)
+    print('Max memory usage :: %dkB' % rusage.ru_maxrss)
+    print()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="LCP-BWT implementation test runner.")
     parser.add_argument('-t', '--test', action='store_true', default=False, help="Run all tests and output the results")
     parser.add_argument('-g', '--gen', nargs='+', help="Generate test cases having given sizes")
+    parser.add_argument('-a', '--analyze', default=None, help="Analyze execution time and resource consumption on a given test case name")
     args = parser.parse_args()
 
     print('LCP-BWT implementation test runner, version 0.1')
@@ -77,5 +96,8 @@ if __name__ == "__main__":
     if args.gen:
         generate_tests(args.gen)
 
-    if not args.gen or args.test:
+    if (not args.gen and not args.analyze) or args.test:
         run_tests()
+
+    if args.analyze:
+        run_analysis(args.analyze)

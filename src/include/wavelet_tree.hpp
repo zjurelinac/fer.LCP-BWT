@@ -18,7 +18,6 @@ namespace lb {
         lb::size_t rank(lb::size_t index, symbol_type symbol) const;
         lb::size_t select(lb::size_t num, symbol_type symbol) const;   // TODO: @Tonko
         lb::size_t size() const;
-        //void show() const;
     private:
         const lb::alphabet& a;
         lb::size_t sz;
