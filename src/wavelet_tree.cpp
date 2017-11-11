@@ -9,7 +9,7 @@
 #include "base.hpp"
 
 
-static inline lb::size_t binary_rank(lb::bitvector bv, lb::bitvector::value_type bit, lb::size_t index) {
+static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::value_type bit, lb::size_t index) {
     return std::count(bv.begin(), bv.begin() + index, bit);
 }
 
@@ -54,11 +54,9 @@ lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bo
 lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) const {
     const int N = nodes.size();
     int curr = 0, symbol_index = a[(symbol_type)symbol];
-    std::cout << "Finding rank of " << (char) symbol << "[" << symbol_index << "] till " << index << "\n";
 
     alpha_interval alpha = alpha_interval(0, a.size() - 1);
     while (curr < N) {
-        std::cout << "Searching for rank @" << curr << ", " << alpha << "\n";
         auto mid = (alpha.first + alpha.second) / 2;
         bitvector::value_type bit = symbol_index > mid;
         index = binary_rank(nodes[curr], bit, index);
