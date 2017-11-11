@@ -29,8 +29,9 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
         auto mid = (alpha.first + alpha.second) / 2;
         auto chr = a[(lb::size_t) mid];
 
-        bitvector bv(range.second - range.first, false);
-        std::transform(range.first, range.second, bv.begin(), [chr](auto x){ return x > chr; });
+        bitvector bv;
+        for (auto it = range.first; it != range.second; ++it)
+            bv.push_back(*it > chr);
 
         std::stable_partition(range.first, range.second, [chr](auto x){ return x <= chr; });
         auto bound = std::upper_bound(range.first, range.second, chr);

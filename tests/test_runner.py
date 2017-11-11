@@ -54,6 +54,8 @@ def run_tests():
 
     for test_name in test_names:
         test_path = os.path.join(TESTS_PATH, test_name)
+        if os.path.isdir(test_path):
+            continue
         test_out = os.path.join(TESTS_OUT_DIR, test_name) + '.out'
         test_in, test_exp = test_path + '.in', test_path + '.out'
         subprocess.run([EXEC_PATH, test_in, test_out], check=True)
