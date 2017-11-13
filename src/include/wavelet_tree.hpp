@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "fast_bitvector.hpp"
 #include "base.hpp"
 #include "alphabet.hpp"
 
