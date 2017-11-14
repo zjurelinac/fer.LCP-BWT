@@ -1,11 +1,10 @@
-CXX = clang++-4.0 #g++
+CXX = g++
 
 OPT_LVL = 3
 PROFILE = true
 DFLAGS = DEBUG USE_FAST_BV LITTLE_ENDIAN
 DFLAGS_ = $(foreach flag,$(DFLAGS),-D$(flag))
 CFLAGS = -std=c++14 -g -O$(OPT_LVL) -msse4.2 -Wall -Wextra -Wno-char-subscripts -I./src/include $(DFLAGS_)
-LDFLAGS = -lsdsl -ldivsufsort
 
 ifeq ($(PROFILE), true)
 	CFLAGS += -pg

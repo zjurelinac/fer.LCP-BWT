@@ -5,8 +5,10 @@
 #include <iterator>
 
 #include "base.hpp"
+#define BUCKET_SIZE 256
 
 namespace lb {
+    //template<unsigned int BUCKET_SIZE = 256>
     class fast_bitvector {
         using base_bitvector = std::vector<bool>;
     public:
