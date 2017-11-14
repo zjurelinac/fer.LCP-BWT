@@ -9,17 +9,18 @@
 #include <utility>
 #include <vector>
 
-
 namespace lb {
     using int8 = signed char;
     using size_t = unsigned int;
-    using bitvector = std::vector<bool>;
     using sequence = std::string;
     using symbol_type = sequence::value_type;
     using alpha_interval = std::pair<int8, int8>;
     using interval = std::pair<lb::size_t, lb::size_t>;
     using intervals = std::vector<interval>;
     using lcp_array = std::vector<int8>;
+#ifndef USE_FAST_BV
+    using bitvector = std::vector<bool>;
+#endif
 }
 
 #ifdef DEBUG

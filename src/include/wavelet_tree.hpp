@@ -3,9 +3,12 @@
 
 #include <vector>
 
-#include "fast_bitvector.hpp"
 #include "base.hpp"
 #include "alphabet.hpp"
+
+#ifdef USE_FAST_BV
+#include "fast_bitvector.hpp"
+#endif
 
 namespace lb {
     class wavelet_tree {

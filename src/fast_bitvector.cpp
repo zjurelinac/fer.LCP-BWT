@@ -1,36 +1,23 @@
 #include "fast_bitvector.hpp"
 #include "base.hpp"
-#include <iostream>
 #include <algorithm>
-#include <iostream>
-#include <queue>
-#include <string>
-#include <utility>
 #include <iterator>
 
-lb::fast_bitvector::fast_bitvector(std::vector<bool> bv) : bv(bv) {
 
-}
+lb::fast_bitvector::fast_bitvector() : bv() {}
 
-lb::fast_bitvector::fast_bitvector(){
-	bv = std::vector<bool>();
-}
-void lb::fast_bitvector::push_back(const bool& val){
+lb::fast_bitvector::fast_bitvector(const fast_bitvector &fbv) : bv(fbv.bv), cs(fbv.cs) {}
+
+void lb::fast_bitvector::push_back(const bool& val) {
 	return bv.push_back(val);
 }
 
-lb::size_t lb::fast_bitvector::size(){
+lb::size_t lb::fast_bitvector::size() const {
 	return bv.size();
 }
 
-
-lb::size_t lb::fast_bitvector::rank(lb::size_t index, bool bit){
+lb::size_t lb::fast_bitvector::rank(const lb::size_t index, const bool bit) const {
 	return std::count(bv.begin(), bv.begin() + index, bit);
-
-}
-
-std::vector<bool>::iterator lb::fast_bitvector::begin() {
-	return bv.begin();
 }
 
 

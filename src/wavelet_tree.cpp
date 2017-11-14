@@ -9,9 +9,16 @@
 #include "base.hpp"
 
 
+#ifdef USE_FAST_BV
+static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::value_type bit, lb::size_t index) {
+    return bv.rank(index, bit);
+}
+#else
 static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::value_type bit, lb::size_t index) {
     return std::count(bv.begin(), bv.begin() + index, bit);
 }
+#endif
+
 
 lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : a(a), sz(in.size()) {
     using subseq = std::pair<sequence::iterator, sequence::iterator>;
