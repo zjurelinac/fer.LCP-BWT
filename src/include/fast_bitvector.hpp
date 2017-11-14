@@ -10,9 +10,9 @@ namespace lb {
     class fast_bitvector {
         using base_bitvector = std::vector<bool>;
     public:
-	    using value_type = bool;
-	    fast_bitvector();
-	    fast_bitvector(const fast_bitvector& fbv);
+        using value_type = bool;
+        fast_bitvector();
+        fast_bitvector(const fast_bitvector& fbv);
         fast_bitvector(fast_bitvector&& fbv);
         size_t rank(size_t index, bool bit = false) const;
         void push_back(const bool& val);
