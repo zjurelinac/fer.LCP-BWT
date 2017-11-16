@@ -1,6 +1,6 @@
 CXX = g++
 
-OPT_LVL = 3
+OPT_LVL = 0
 PROFILE = true
 DFLAGS = DEBUG USE_FAST_BV LITTLE_ENDIAN
 DFLAGS_ = $(foreach flag,$(DFLAGS),-D$(flag))
