@@ -27,8 +27,6 @@ lb::intervals lb::get_intervals(const lb::interval& start, const lb::alphabet& a
     using tmp_node = std::tuple<size_t, interval, alpha_interval>;
     intervals list;
 
-    std::cout << "get_intervals(" << start << ")\n";
-
     std::queue<tmp_node> work_queue;
     work_queue.push(tmp_node(0, start, alpha_interval(0, a.size() - 1)));
 
@@ -49,8 +47,6 @@ lb::intervals lb::get_intervals(const lb::interval& start, const lb::alphabet& a
             auto b0 = ranks.second;
             auto a1 = range.first - a0;
             auto b1 = range.second + 1 - b0;
-
-            std::cout << "\tRange: " << range << ", ranks: " << ranks << "; a0 = " << a0 << ", b0 = " << b0 << "; a1 = " << a1 << ", b1 = " << b1 << "\n";
 
             if (b0 > a0)
                 work_queue.push(tmp_node(2*node + 1, interval(a0, b0 - 1), alpha_interval(alpha.first, m)));
@@ -78,7 +74,7 @@ lb::lcp_array lb::build_lcp(const wtree& wt, const alphabet& a) {
         auto curr = work_queue.front(); work_queue.pop();
 
         auto list = get_intervals(curr.first, a, wt);
-        for (auto intvl : list) {
+        for (auto &intvl : list) {
             if (lcp[intvl.second + 1] == BOTTOM) {
                 work_queue.push(tmp_state(intvl, curr.second + 1));
                 lcp[intvl.second + 1] = curr.second;

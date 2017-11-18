@@ -1,10 +1,16 @@
 CXX = g++
 
-OPT_LVL = 0
-PROFILE = true
-DFLAGS = DEBUG USE_FAST_BV LITTLE_ENDIAN
+PROFILE = false
+DEBUG = false
+OPT_LVL = 3
+
+DFLAGS = USE_FAST_BV
 DFLAGS_ = $(foreach flag,$(DFLAGS),-D$(flag))
-CFLAGS = -std=c++14 -g -O$(OPT_LVL) -msse4.2 -Wall -Wextra -Wno-char-subscripts -I./src/include $(DFLAGS_)
+CFLAGS = -std=c++14 -O$(OPT_LVL) -msse4.2 -Wall -Wextra -Wno-char-subscripts -I./src/include $(DFLAGS_)
+
+ifeq ($(DEBUG), true)
+	CFLAGS += -g -DDEBUG
+endif
 
 ifeq ($(PROFILE), true)
 	CFLAGS += -pg
@@ -26,10 +32,13 @@ all: .build $(EXEC)
 	@mkdir -p build
 
 $(EXEC): $(OBJS) $(DEPS)
-	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	@echo $(CXX): building $@...
+	@$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	@echo Completed.
 
 $(ODIR)/%.o: $(SDIR)/%.cpp $(DEPS)
-	$(CXX) -c -o $@ $< $(CFLAGS)
+	@echo $(CXX): compiling $<...
+	@$(CXX) -c -o $@ $< $(CFLAGS)
 
 clean:
 	@\rm -r build

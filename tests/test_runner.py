@@ -53,6 +53,8 @@ def run_tests():
     results = []
 
     for test_name in test_names:
+        if not test_name.startswith('auto-test_'):
+            continue
         test_path = os.path.join(TESTS_PATH, test_name)
         if os.path.isdir(test_path):
             continue

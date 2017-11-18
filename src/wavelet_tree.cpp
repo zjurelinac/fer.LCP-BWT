@@ -11,7 +11,7 @@
 
 #ifdef USE_FAST_BV
 static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::value_type bit, lb::size_t index) {
-    return bv.rank(index, bit);
+    return index ? bv.rank(index - 1, bit) : 0;
 }
 #else
 static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::value_type bit, lb::size_t index) {
@@ -25,11 +25,11 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
     using tmp_node = std::pair<alpha_interval, subseq>;
 
     sequence in_copy = in;
-    std::queue<tmp_node> workspace;
-    workspace.push(tmp_node(alpha_interval(0, a.size() - 1), subseq(in_copy.begin(), in_copy.end())));
+    std::queue<tmp_node> work_queue;
+    work_queue.push(tmp_node(alpha_interval(0, a.size() - 1), subseq(in_copy.begin(), in_copy.end())));
 
-    while (!workspace.empty()) {
-        auto curr = workspace.front(); workspace.pop();
+    while (!work_queue.empty()) {
+        auto curr = work_queue.front(); work_queue.pop();
         auto alpha = curr.first;
         auto range = curr.second;
 
@@ -45,13 +45,11 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
         nodes.push_back(bv);
 
         if (alpha.second - alpha.first > 1) {
-            workspace.push(tmp_node(alpha_interval(alpha.first, mid), subseq(range.first, bound)));
-            workspace.push(tmp_node(alpha_interval(mid + 1, alpha.second), subseq(bound, range.second)));
+            work_queue.push(tmp_node(alpha_interval(alpha.first, mid), subseq(range.first, bound)));
+            work_queue.push(tmp_node(alpha_interval(mid + 1, alpha.second), subseq(bound, range.second)));
         }
     }
 }
-
-lb::wavelet_tree::wavelet_tree(const wavelet_tree& wt) : a(wt.a), sz(wt.sz), nodes(wt.nodes) {}
 
 lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bool bit) const {
     auto left = range.first > 0 ? binary_rank(nodes[node], bit, range.first) : 0;
@@ -78,10 +76,6 @@ lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) cons
     }
 
     return index;
-}
-
-lb::size_t lb::wavelet_tree::size() const {
-    return sz;
 }
 
 /*static std::string indent(int n) {
