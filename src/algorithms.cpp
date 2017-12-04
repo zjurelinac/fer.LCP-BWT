@@ -1,10 +1,11 @@
+#include <algorithm>
 #include <map>
 #include <queue>
 #include <tuple>
 
-#include "sais.hpp"
 #include "algorithms.hpp"
-
+#include "sais.hpp"
+#include "stack.hpp"
 
 lb::sequence lb::build_bwt(const lb::sequence& in) {
     sequence bwt;
@@ -27,11 +28,11 @@ lb::intervals lb::get_intervals(const lb::interval& start, const lb::alphabet& a
     using tmp_node = std::tuple<size_t, interval, alpha_interval>;
     intervals list;
 
-    std::queue<tmp_node> work_queue;
+    lb::smallstack<tmp_node> work_queue;
     work_queue.push(tmp_node(0, start, alpha_interval(0, a.size() - 1)));
 
     while (!work_queue.empty()) {
-        auto curr = work_queue.front(); work_queue.pop();
+        auto curr = work_queue.pop();
         auto node = std::get<0>(curr);
         auto range = std::get<1>(curr);
         auto alpha = std::get<2>(curr);
