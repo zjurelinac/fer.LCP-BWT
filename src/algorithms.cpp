@@ -4,8 +4,8 @@
 #include <tuple>
 
 #include "algorithms.hpp"
+#include "containers.hpp"
 #include "sais.hpp"
-#include "stack.hpp"
 
 lb::sequence lb::build_bwt(const lb::sequence& in) {
     sequence bwt;
