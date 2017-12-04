@@ -42,7 +42,7 @@ public:
     bitvector(bitvector&& bv)
         : store(std::move(bv.store)), bi(std::move(bv.bi)), sz(bv.sz) {}
     bool operator[](size_t index) const
-        { return (store[index >> LOG_BLOCK_SIZE] & (1 << (index & MASK_BLOCK_SIZE))) != 0; }
+        { return (store[index >> LOG_BLOCK_SIZE] & (1ULL << (index & MASK_BLOCK_SIZE))) != 0ULL; }
     std::size_t size() const
         { return sz; }
     base_type block(size_t block_index) const
@@ -50,7 +50,7 @@ public:
     size_t block_count(size_t block_index) const
         { return pc<BLOCK_SIZE, base_type>::popcount(block(block_index)); }
     size_t block_count(size_t block_index, size_t bits) const
-        { return pc<BLOCK_SIZE, base_type>::popcount(block(block_index) & ((1 << bits) - 1)); }
+        { return pc<BLOCK_SIZE, base_type>::popcount(block(block_index) & ((1ULL << bits) - 1ULL)); }
     void push_back(const bool& val);
 
 private:
@@ -63,7 +63,7 @@ private:
 namespace lb {
     template<unsigned int bucket_size = 256>
     class fast_bitvector {
-        using base_bitvector = bitvector<unsigned int>;
+        using base_bitvector = bitvector<unsigned long long>;
 
         const static unsigned int BUCKET_SIZE = bucket_size;
         const static std::size_t LOG_BUCKET_SIZE = clog2(BUCKET_SIZE);
@@ -71,8 +71,8 @@ namespace lb {
     public:
         using value_type = bool;
 
-        fast_bitvector() {};
-
+        fast_bitvector()
+            { cs.push_back(0); };
         fast_bitvector(const fast_bitvector& fbv)
             : bv(fbv.bv), cs(fbv.cs) {}
         fast_bitvector(fast_bitvector&& fbv)
@@ -84,8 +84,8 @@ namespace lb {
         size_t rank(size_t index, bool bit = true) const;
 
         void push_back(const bool& val);
-    private:
         base_bitvector bv;
+    private:
         std::vector<size_t> cs;
 
         size_t count_bits(size_t start_pos, size_t count) const;
@@ -99,7 +99,7 @@ template <typename T>
 void bitvector<T>::push_back(const bool& val) {
     if (!bi)
         store.push_back(0);
-    store[store.size() - 1] |= val << bi;
+    store[store.size() - 1] |= ((base_type) val) << bi;
     bi = (bi + 1) & MASK_BLOCK_SIZE;
     ++sz;
 }
@@ -122,8 +122,8 @@ inline lb::size_t lb::fast_bitvector<bucket_size>::count_bits(size_t start_pos, 
 template <unsigned int bucket_size>
 void lb::fast_bitvector<bucket_size>::push_back(const bool& val) {
 	if (!(bv.size() & MASK_BUCKET_SIZE))
-        cs.push_back(cs.size() ? cs[cs.size() - 1] : 0);
-	if (val)
+        cs.push_back(cs[cs.size() - 1] + val);
+	else if (val)
 	    ++cs[cs.size() - 1];
     bv.push_back(val);
 }
@@ -132,7 +132,7 @@ template <unsigned int BUCKET_SIZE>
 lb::size_t lb::fast_bitvector<BUCKET_SIZE>::rank(const lb::size_t index, const bool bit) const {
     size_t bucket = index >> LOG_BUCKET_SIZE;
     size_t base = bucket << LOG_BUCKET_SIZE;
-    size_t sol = (bucket > 0 ? cs[bucket - 1] : 0) + count_bits(base, index - base + 1);
+    size_t sol = cs[bucket] + count_bits(base, index - base + 1);
     return bit ? sol : index - sol + 1;
 }
 
