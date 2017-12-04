@@ -10,7 +10,7 @@
 - `deque` (from `build_lcp` or `get_intervals`) -> **9%** of time spent in it   -> replace with stack / implement custom bare stack
 - `vector` (from `deque`) -> **7%** of time spent in it                         -> -v-
 - `fast_bitvector.push_back` -> **3%** of time spent in it                      -> think of a better implementation
-- `alphabet constructor` -> **2%** of time spent in it                          -> use fixed arrays (ASCII <-> INT)
+- `alphabet constructor` -> **2%** of time spent in it                          -> use fixed arrays (ASCII <-> INT)     [DONE]
 - `output_results` -> **2%** of time spent in it                                -> use fastIO if neccessary
 
 ## Various simple things
