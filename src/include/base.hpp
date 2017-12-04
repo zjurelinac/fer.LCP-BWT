@@ -11,6 +11,7 @@
 
 namespace lb {
     using int8 = signed char;
+    using uint8 = unsigned char;
     using size_t = unsigned int;
     using sequence = std::string;
     using symbol_type = sequence::value_type;

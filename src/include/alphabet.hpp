@@ -1,35 +1,51 @@
 #ifndef _ALPHABET_HPP_
 #define _ALPHABET_HPP_
 
+#include <cstring>
 #include <map>
-#include <unordered_map>
-#include <cstdio>
 
 #include "base.hpp"
 
 namespace lb {
     class alphabet {
     public:
-        alphabet() {}
+        alphabet()
+            : sz(0) {}
+        inline alphabet(const lb::sequence& text);
 
-        alphabet(const alphabet& a)
-            : map(a.map), rmap(a.rmap), cs(a.cs) {}
-        alphabet(alphabet&& a)
-            : map(std::move(a.map)), rmap(std::move(a.rmap)), cs(std::move(a.cs)) {}
-        alphabet(const lb::sequence& text);
         symbol_type operator[](lb::size_t index) const
-           { return rmap.find(index)->second; }
-        lb::size_t operator[](symbol_type symbol) const
-            { return map.find(symbol)->second; }
+           { return rmap[index]; }
+        uint8 operator[](symbol_type symbol) const
+            { return map[symbol]; }
         int csum(lb::size_t index) const
-            { return cs.find(index)->second; }
+            { return cs[index]; }
         lb::size_t size() const
-            { return map.size(); }
+            { return sz; }
     private:
-        std::unordered_map<symbol_type, lb::size_t> map;
-        std::unordered_map<lb::size_t, symbol_type> rmap;
-        std::unordered_map<symbol_type, lb::size_t> cs;
+        uint8 map[256];
+        char rmap[256];
+        lb::size_t cs[256];
+        lb::size_t sz;
     };
+}
+
+lb::alphabet::alphabet(const lb::sequence& text) {
+    std::map<symbol_type, int> cnt;
+    for (auto& c : text) ++cnt[c];
+
+    memset(map, 0, sizeof(map));
+    memset(rmap, 0, sizeof(rmap));
+    memset(cs, 0, sizeof(cs));
+
+    sz = cnt.size();
+
+    int tsum = 0, tindex = 0;
+    for (auto& it : cnt) {
+        map[it.first] = tindex;
+        rmap[tindex] = it.first;
+        cs[tindex++] = tsum;
+        tsum += it.second;
+    }
 }
 
 #endif  // _ALPHABET_HPP_
