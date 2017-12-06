@@ -24,7 +24,7 @@
             "name": "(gdb) Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/src/fbv",
+            "program": "${workspaceRoot}/tests/debug/fq",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
