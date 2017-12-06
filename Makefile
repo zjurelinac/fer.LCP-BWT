@@ -1,4 +1,4 @@
-CXX = g++
+CXX = clang++-4.0 # g++
 
 PROFILE = false
 DEBUG = false

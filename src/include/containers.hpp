@@ -4,6 +4,8 @@
 #include <utility>
 
 #define SMALLSTACK_SIZE 32
+#define FASTQUEUE_OPT_SIZE 4096
+#define FASTQUEUE_START_SIZE 32
 
 namespace lb {
     template <typename T>
@@ -27,20 +29,39 @@ namespace lb {
         using block_type = std::pair<T*, lb::size_t>;
     public:
         fastqueue()
-            : front(), back() {}
-        void push(T elem)
-            { if (front) ; }
-        T pop(T elem)
-            {  }
-        bool empty() const;
+            : front(0), back(0), size(0) {}
+        inline void push(T elem);
+
+        inline T pop();
+
+        bool empty() const
+            { return size == 0; }
     private:
-        size_t pick_size()
-            { return 20; }
-        void add_block()
-            { auto size = pick_size(); list.emplace_back(new T[size], size); back = 0; }
+        size_t new_block_size()
+            { return size ? 16 : FASTQUEUE_START_SIZE; }
+        void add_block(size_t size)
+            { printf("Adding block of size %u\n", size); list.emplace_front(new T[size], size); front = size; }
         void remove_block()
-            { list.pop_front(); front = 0; }
-        size_t front, back;
+            { printf("Removing block of size %u\n", list.back().second); delete[] list.back().first; list.pop_back(); back = list.back().second; }
+        size_t front, back, size;
         std::list<block_type> list;
     };
+}
+
+template <typename T>
+void lb::fastqueue<T>::push(T elem) {
+    if (size == 0 || front == 0)
+        add_block(new_block_size());
+    if (!size)
+        back = FASTQUEUE_START_SIZE;
+    (list.front().first)[--front] = elem;
+    ++size;
+}
+
+template <typename T>
+T lb::fastqueue<T>::pop() {
+    if (back == 0)
+        remove_block();
+    --size;
+    return (list.back().first)[--back];
 }
