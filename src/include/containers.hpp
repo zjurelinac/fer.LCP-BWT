@@ -4,8 +4,9 @@
 #include <utility>
 
 #define SMALLSTACK_SIZE 32
-#define FASTQUEUE_OPT_SIZE 4096
-#define FASTQUEUE_START_SIZE 512
+#define FASTQUEUE_START_SIZE 32
+#define FASTQUEUE_ALIGN 0xFFFFFFF0
+#define FASTQUEUE_OPT_SIZE (1 << 18)
 
 namespace lb {
     template <typename T>
@@ -38,7 +39,7 @@ namespace lb {
             { return size == 0; }
     private:
         size_t new_block_size()
-            { return size ? 512 : FASTQUEUE_START_SIZE; }
+            { return size ? (2*size / (1 + size/FASTQUEUE_OPT_SIZE)) & FASTQUEUE_ALIGN : FASTQUEUE_START_SIZE; }
         void add_block(size_t size)
             { list.emplace_front(new T[size], size); front = size; }
         void remove_block()
