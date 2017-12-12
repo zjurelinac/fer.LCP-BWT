@@ -8,6 +8,14 @@
 #include "base.hpp"
 #include "alphabet.hpp"
 
+//  -----------------------------------------------------------------------------
+//  *****************************************************************************
+//
+//  Header defining namespace with interface for BWT algorithm.
+//  © 2017 All rights reserved.
+//
+//  *****************************************************************************
+//  -----------------------------------------------------------------------------
 namespace lb {
     sequence build_bwt(const sequence& in);
     wtree build_wtree(const sequence& bwt, const alphabet& a);
