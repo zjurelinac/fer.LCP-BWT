@@ -1,11 +1,3 @@
-#ifndef _ALPHABET_HPP_
-#define _ALPHABET_HPP_
-
-#include <cstring>
-#include <map>
-
-#include "base.hpp"
-
 //  -----------------------------------------------------------------------------
 //  *****************************************************************************
 //
@@ -14,6 +6,15 @@
 //
 //  *****************************************************************************
 //  -----------------------------------------------------------------------------
+
+#ifndef _ALPHABET_HPP_
+#define _ALPHABET_HPP_
+
+#include <cstring>
+#include <map>
+
+#include "base.hpp"
+
 namespace lb {
     class alphabet {
     public:
