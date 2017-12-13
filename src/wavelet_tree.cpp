@@ -1,3 +1,12 @@
+//  -----------------------------------------------------------------------------
+//  *****************************************************************************
+//
+//  Wavelet tree implementation
+//  © 2017 All rights reserved.
+//
+//  *****************************************************************************
+//  -----------------------------------------------------------------------------
+
 #include "wavelet_tree.hpp"
 
 #include <algorithm>
@@ -8,7 +17,23 @@
 
 #include "base.hpp"
 
-
+//
+// Binary rank wrapper function.
+//
+// Returns the number of bits equal to `bit` within the first `index` places of bitvector
+//  (ie. in range [0, index-1]). Actual function that is called depends on the type of
+//  the bitvector used (it's own rank for a fast_bitvector, or a generic std::count for
+//  std::vector<bool>).
+//
+// @param bv    - const bitvector reference
+// @param bit   - bit value whose rank is searched (true or false)
+// @param index - search interval bound (interval = [0, index-1])
+//
+// Example:
+//      lb::bitvector bv;                       // Contains, say: 1 0 0 1 1 1 1 0
+//      auto rank = binary_rank(bv, true, 4);   // rank = No. of 1s in [1 0 0 1] 1 1 1 0 = 2
+//                                                                      ~~~~~~~
+//
 #ifdef USE_FAST_BV
 static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::value_type bit, lb::size_t index) {
     return index ? bv.rank(index - 1, bit) : 0;
@@ -19,7 +44,17 @@ static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::val
 }
 #endif
 
-
+//
+// Wavelet tree constructor from an input sequence and it's alphabet.
+//
+// @param in    - Input sequence whose wavelet tree is being built
+// @param a     - Alphabet of symbols comprising the input sequence
+//
+// Example:
+//      lb::sequence in = "T$ACGA";
+//      lb::alphabet a(in);
+//      lb::wavelet_tree wt(in, a);     <- Constructor call
+//
 lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : a(a), sz(in.size()) {
     using subseq = std::pair<sequence::iterator, sequence::iterator>;
     using tmp_node = std::pair<alpha_interval, subseq>;
@@ -51,12 +86,18 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
     }
 }
 
+//
+// 
+//
 lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bool bit) const {
     auto left = range.first > 0 ? binary_rank(nodes[node], bit, range.first) : 0;
     auto right = binary_rank(nodes[node], bit, range.second + 1);
     return interval(left, right);
 }
 
+//
+//
+//
 lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) const {
     const int N = nodes.size();
     int curr = 0, symbol_index = a[(symbol_type)symbol];
