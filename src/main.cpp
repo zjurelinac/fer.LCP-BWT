@@ -1,3 +1,13 @@
+//  -----------------------------------------------------------------------------
+//  *****************************************************************************
+//
+//  Main program file implementing computation of LCP array based on
+//  the Burrows-Wheeler transform.
+//  © 2017 All rights reserved.
+//
+//  *****************************************************************************
+//  -----------------------------------------------------------------------------
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -27,6 +37,16 @@ int main(int argc, char* argv[]) {
     output_results(argv[2], LCP);
 }
 
+//  
+//  Function that parses input file into lb::sequence.
+//  
+//  @param input_file - input file name
+//  @return parsed input file without first line + '$' on the end
+//  
+//  Example:
+//      char* file_name{"data.txt"};
+//      lb::sequence s = parse_input(file_name);
+//
 lb::sequence parse_input(const char* input_file) {
     lb::sequence input, temp;
     std::ifstream file(input_file);
@@ -45,6 +65,17 @@ lb::sequence parse_input(const char* input_file) {
     return input + '$';
 }
 
+//  
+//  Function that ouputs computed LCP array to file.
+//  
+//  @param output_file - output file name
+//  @param lcp - array that will be written to file
+//  
+//  Example:
+//      char* file_name{"output.txt"};
+//      lb::lcp:array array{1, 2, 5, 3, 12, 9};
+//      output_results(file_name, array);  //  file contains "[1,2,5,3,12,9]"
+//
 void output_results(const char* output_file, lb::lcp_array& lcp) {
     std::ofstream ofs(output_file);
     ofs << "[";

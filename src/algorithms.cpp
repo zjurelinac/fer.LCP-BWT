@@ -1,3 +1,12 @@
+//  -----------------------------------------------------------------------------
+//  *****************************************************************************
+//
+//  Implementation of algorithms to compute LCP with BWT transform.
+//  © 2017 All rights reserved.
+//
+//  *****************************************************************************
+//  -----------------------------------------------------------------------------
+
 #include <algorithm>
 #include <map>
 #include <queue>
@@ -7,6 +16,19 @@
 #include "containers.hpp"
 #include "sais.hpp"
 
+//  
+//  Function that transforms input sequence into BWT sequence.
+//  
+//  BWT[i] = S[SA[i] - 1]   , for SA[i] != 1
+//  BWT[i] = '$'            , otherwise
+//  
+//  @param in - S[1..n]
+//  @return BWT[1..n]
+//  
+//  Example:
+//      lb::sequence S = "ACGCAT$";
+//      lb::sequence bwt_s = lb::build_bwt(S);  // bwt_s = "T$CGACA";
+//
 lb::sequence lb::build_bwt(const lb::sequence& in) {
     sequence bwt;
     int *sa = new int[in.size()];
@@ -24,6 +46,28 @@ lb::wtree lb::build_wtree(const lb::sequence& bwt, const lb::alphabet &a) {
     return wt;
 }
 
+//  
+//  Function implements Algorithm 1 from
+//  http://www.sciencedirect.com/science/article/pii/S1570866712001104#fg0040
+//  
+//  For an ω-interval [i..j], the function call getIntervals([i..j]) returns 
+//  the list of all cω-intervals. 
+//
+//  For further details check website.
+//  
+//  @param start - ω-interval
+//  @param a - alphabet
+//  @param wt - wavelet tree
+//  @return list of all cω-intervals
+//  
+//  Example:
+//      lb::sequence S = "ACGCAT$";
+//      lb::alphabet A{S};
+//      lb::sequence bwt_s = lb::build_bwt(S);
+//      lb::wtree wt = lb::build_wtree(bwt_s, A);
+//      lb::interval interval(0, S.size() -1);
+//      lb::inervals intervals = lb::get_intervals(interval, A, wt);
+//
 lb::intervals lb::get_intervals(const lb::interval& start, const lb::alphabet& a, const lb::wtree& wt) {
     using tmp_node = std::tuple<size_t, interval, alpha_interval>;
     intervals list;
@@ -59,6 +103,26 @@ lb::intervals lb::get_intervals(const lb::interval& start, const lb::alphabet& a
     return list;
 }
 
+//  
+//  Function implements Algorithm 2 from
+//  http://www.sciencedirect.com/science/article/pii/S1570866712001104#fg0040
+//  
+//  Algorithm 2 computes LCP-array in O(nlog σ) time. 
+//  It uses only the wavelet tree of the BWT of S, a queue to store the ω-intervals and the LCP-array.
+//
+//  For further details check website.
+//  
+//  @param wt - wavelet tree
+//  @param a - alphabet
+//  @return LCP array
+//  
+//  Example:
+//      lb::sequence S = "ACGCAT$";
+//      lb::alphabet A{S};
+//      lb::sequence bwt_s = lb::build_bwt(S);
+//      lb::wtree wt = lb::build_wtree(bwt_s, A);
+//      lb::lcp_array LCP = lb::build_lcp(wt, A);
+//
 lb::lcp_array lb::build_lcp(const wtree& wt, const alphabet& a) {
     using tmp_state = std::pair<interval, size_t>;
     const int BOTTOM = -2;
