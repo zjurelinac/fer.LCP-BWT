@@ -1,0 +1,158 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{booktabs}
+\usepackage{mathpazo} % Palatino font
+\pretolerance=150
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	
+	\center % Centre everything on the page
+	
+	%------------------------------------------------
+	%	Headings
+	%------------------------------------------------
+	
+	\textsc{\LARGE SVEU\v{C}ILI\v{S}TE U ZAGREBU}\\[0.4cm] % Main heading such as the name of your university/college
+	\textsc{\LARGE \textbf{FAKULTET ELEKTROTEHNIKE I RA\v{C}UNALSTVA}}\\[2.5cm]
+    
+	\textsc{\Large Projekt iz Bioinformatike}\\[0.5cm] % Major heading such as course name
+	
+
+	%------------------------------------------------
+	%	Title
+	%------------------------------------------------
+	
+	
+	{\huge\bfseries Ra\v{c}unanje najduljeg zajedni\v{c}kog prefixa temeljeno na BWT}\\[1.2cm] % Title of your document
+	
+	
+	%------------------------------------------------
+	%	Author(s)
+	%------------------------------------------------
+	\begin{minipage}{2.5\textwidth}
+		\begin{flushleft}
+			\large
+			\textit{Autori}\\
+			 \textsc{Zvonimir Jurelinac, Tomislav Živec, Tonko Čupić} % Your name
+		\end{flushleft}
+	\end{minipage}
+	~\\[0.2cm]
+	\begin{minipage}{2.5\textwidth}
+		\begin{flushleft}
+			\large
+			\textit{Voditelj}\\
+			doc.dr.sc \textsc{Mirjana Domazet- Lo\v{s}o} % Supervisor's name
+		\end{flushleft}
+	\end{minipage}
+	
+	% If you don't want a supervisor, uncomment the two lines below and comment the code above
+	%{\large\textit{Author}}\\
+	%John \textsc{Smith} % Your name
+	
+	%------------------------------------------------
+	%	Date
+	%------------------------------------------------
+	
+	\vfill\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+	
+	{\large Zagreb, prosinac 2017.} % Date, change the \today to a set date if you want to be precise
+	
+	%------------------------------------------------
+	%	Logo
+	%------------------------------------------------
+	
+	%\vfill\vfill
+	%\includegraphics[width=0.2\textwidth]{placeholder.jpg}\\[1cm] % Include a department/university logo - this will require the graphicx package
+	 
+	%----------------------------------------------------------------------------------------
+	
+	
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Uvod}
+
+Bioinformatika je grana znanosti koja usko povezuje biologiju i računarstvo, a ubrzano se razvijala zadnja dva desetljeća. Pojeftinjenje i sve veća dostupnost tehnologije sekvenciranja rezultirale su stvaranjem velikih skupova bioloških podataka. Često se kao zadatak u bioinformatici nameće analiza sekvence genoma.
+Pošto su te sekvence predugačke za uobičajenu pohranu i analizu, potrebno je koristiti posebna sufiksna polja i polja najdužeg zajedničkog prefiksa. Cilj projekta je bio implementirati algoritme 1 i 2 iz rada Beller et al. (2013), koristeći gotovu knjižnicu za izgradnju sufiksnog polja. 
+Zatim je implementacija testirana sa našom implementacijom stabla valića i njegove funkcije rang. Rješenje je uspoređeno s rezultatima iz studetskog rada Mrčela et al. (2016). Kao ulazni niz koristili smo genom bakterije E. Coli
+
+\newpage
+
+\section{Algoritmi}
+U problemima analiza sekvenci vrlo često se javlja potreba za izračunom najduljeg zajedničkog prefiksa ( LCP). U tu svrhu koriste sufiksni nizovi koji spremaju u listu spremaju sve moguće sufikse sekvence, od duljine 1 do najdulje. Iz sufiksnog niza dobiva se LCP polje u linearnom vremenu. 
+Veliki resursni zahtjevi analize senkvenci DNK nameću zahtjeve za korištenjem podatkovnih struktura koje koriste manje memorijskog prostora. Iz te potrebe razvijeno je stablo valića niza transformiranog Burrows- Wheelerovom transformacijom ( BWT).
+Metoda je sljedeća: sekvenca se prvo podliježe Burrows- Wheelerovoj transformaciji, potom se transformirana sekvenca sprema u stablo valića. Stablo valića podržava pretraživanje unatrag po originalnom nizu pa tako dobivamo tražene sufikse. Opisani algoritam ima složenost $O(n\log\sigma)$, gdje je $\sigma$ veličina abecede.
+
+\subsection{Podatkovne strukture}
+
+\subsubsection{Sufiksno polje}
+Sufiksno polje sadrži sve sufikse od teksta S. Zamijenila je u toj zadaći sufiksno stablo jer koristi manje memorije od sufiksnog stabla za istu zadaću. Sufiksno polje se pokazalo kao vrlo važan alat u raspoznavanju i analizi teksta, bioinformatici i drugim primjenama. 
+Sufiksno polje SA od niza znakova S je cjelobrojno polje u intervalu od 1 do n koje određuje leksikografski poredak svih n sufiksa niza znakova S. Preciznije, sufiksno polje zadovoljava $ S_{SA[1]} < S_{SA[2]} < ... < S_{SA[n]}$, gdje $ S_i $ označava i-ti sufiks niza znakova S, te sadrži znakove S[i..n].
+ 
+\begin{table}
+	\caption{Pridruživanje indeksa sufiksima niza S, počevši od najduljeg.}
+	\label{tablePrimjer1}
+	\begin{center}
+		\begin{tabular}{ll}
+			\toprule
+			i & S$_{SA}$[i] \\
+			\midrule
+			1 & abrakadabra\$ \\
+			2 & brakadabra\$ \\
+			3 & rakadabra\$ \\
+			4 & akadabra\$ \\
+			5 & kadabra\$ \\
+			6 & adabra\$ \\
+			7 & dabra\$ \\
+			8 & abra\$ \\
+			9 & bra\$ \\
+			10 & ra\$ \\
+			11 & a\$ \\
+			12 & \$ \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}
+	\caption{Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
+	\label{tablePrimjer2}
+	\begin{center}
+		\begin{tabular}{rrll}
+			\toprule
+			i & SA[i] & S$_{SA}$[i] & BWT[i] \\
+			\midrule
+			1 & 12 & \$ & a\\
+			2 & 11 &  a\$ & r \\
+			3 & 8 & abra\$ & d \\
+			4 & 1 & abrakadabras\$ & \$ \\
+			5 & 6 & adabra\$ & k \\
+			6 & 4 & akadabra\$ & r \\
+			7 & 9 & bra\$ & a\\
+			8 & 2 & brakadabra\$ & a\\
+			9 & 7 & dabra\$ & a \\
+			10 & 5 & kadabra\$ & a\\
+			11 & 10 & ra\$ & b \\
+			12 & 3 & rakadabra\$ & b\\
+			\bottomrule
+		\end{tabular}
+		
+	\end{center}
+	
+\end{table}
+
+
+\end{document}
