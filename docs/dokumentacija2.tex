@@ -5,6 +5,7 @@
 \usepackage{booktabs}
 \usepackage{mathpazo} % Palatino font
 \pretolerance=150
+\usepackage{amsmath}
 
 \begin{document}
 
@@ -92,8 +93,8 @@ Zatim je implementacija testirana sa našom implementacijom stabla valića i nje
 \newpage
 
 \section{Algoritmi}
-U problemima analiza sekvenci vrlo često se javlja potreba za izračunom najduljeg zajedničkog prefiksa ( LCP). U tu svrhu koriste sufiksni nizovi koji spremaju u listu spremaju sve moguće sufikse sekvence, od duljine 1 do najdulje. Iz sufiksnog niza dobiva se LCP polje u linearnom vremenu. 
-Veliki resursni zahtjevi analize senkvenci DNK nameću zahtjeve za korištenjem podatkovnih struktura koje koriste manje memorijskog prostora. Iz te potrebe razvijeno je stablo valića niza transformiranog Burrows- Wheelerovom transformacijom ( BWT).
+U problemima analiza sekvenci vrlo često se javlja potreba za izračunom najduljeg zajedničkog prefiksa (LCP). U tu svrhu koriste sufiksni nizovi koji spremaju u listu spremaju sve moguće sufikse sekvence, od duljine 1 do najdulje. Iz sufiksnog niza dobiva se LCP polje u linearnom vremenu. 
+Veliki resursni zahtjevi analize senkvenci DNK nameću zahtjeve za korištenjem podatkovnih struktura koje koriste manje memorijskog prostora. Iz te potrebe razvijeno je stablo valića niza transformiranog Burrows- Wheelerovom transformacijom (BWT).
 Metoda je sljedeća: sekvenca se prvo podliježe Burrows- Wheelerovoj transformaciji, potom se transformirana sekvenca sprema u stablo valića. Stablo valića podržava pretraživanje unatrag po originalnom nizu pa tako dobivamo tražene sufikse. Opisani algoritam ima složenost $O(n\log\sigma)$, gdje je $\sigma$ veličina abecede.
 
 \subsection{Podatkovne strukture}
@@ -101,6 +102,17 @@ Metoda je sljedeća: sekvenca se prvo podliježe Burrows- Wheelerovoj transforma
 \subsubsection{Sufiksno polje}
 Sufiksno polje sadrži sve sufikse od teksta S. Zamijenila je u toj zadaći sufiksno stablo jer koristi manje memorije od sufiksnog stabla za istu zadaću. Sufiksno polje se pokazalo kao vrlo važan alat u raspoznavanju i analizi teksta, bioinformatici i drugim primjenama. 
 Sufiksno polje SA od niza znakova S je cjelobrojno polje u intervalu od 1 do n koje određuje leksikografski poredak svih n sufiksa niza znakova S. Preciznije, sufiksno polje zadovoljava $ S_{SA[1]} < S_{SA[2]} < ... < S_{SA[n]}$, gdje $ S_i $ označava i-ti sufiks niza znakova S, te sadrži znakove S[i..n].
+ 
+\subsubsection{Burrows- Wheelerova transformacija (BWT)}
+Burrows- Wheelerova transformacija pretvara niz znakova u sličan niz znakova BWT[1..n] sa istom abecedom. Koristi se za kompresiju podataka. Transformacija je reverzibilna bez dodatnih resursnih zahtjeva. Elemente transformiranog niza računamo formulom:
+
+\[
+BWT[i]=\begin{cases}
+S[SA[i]-1], & \text{ako } SA[i]\neq 1 &
+\$, & \text{inače}.
+\end{cases}
+\]
+ 
  
 \begin{table}
 	\caption{Pridruživanje indeksa sufiksima niza S, počevši od najduljeg.}
@@ -153,6 +165,17 @@ Sufiksno polje SA od niza znakova S je cjelobrojno polje u intervalu od 1 do n k
 	\end{center}
 	
 \end{table}
+
+\newpage
+
+\subsubsection{Stablo valića}
+
+Stablo valića je struktura podataka koja rekurzivno particionira tok u 2 dijela sve dok su u svakom dijelu preostali homogeni podatci. Ime stabla je analogno valnoj transformaciji signala koji rekurzivno dekompresira signal prema frenkvencijama komponenti. 
+
+Stablo valića može efikasno raditi upite rank i select nad nizovima proizvoljnih abeceda. To nam omogućuje pretraživanje unatrag u vremenskoj složenosti od  $O(\log\sigma)$ po koraku.
+Prvo definiramo uzlazno poredanu abecedu $\Eta$kao niz znakova veličine $\sigma $.  
+Zatim definiramo interval [1..r] kao podinterval abecede, r <= $\sigma$
+Za interval [1..r], niz znakova BWT[1..r] dobijemo tako da iz transformiranog niza znakova od S uklonimo sve znakove iz B-W transformacije koji ne pripadaju segmentu abecede [1..r]
 
 
 \end{document}
