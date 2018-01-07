@@ -104,11 +104,12 @@ Sufiksno polje sadrži sve sufikse od teksta S. Zamijenila je u toj zadaći sufi
 Sufiksno polje SA od niza znakova S je cjelobrojno polje u intervalu od 1 do n koje određuje leksikografski poredak svih n sufiksa niza znakova S. Preciznije, sufiksno polje zadovoljava $ S_{SA[1]} < S_{SA[2]} < ... < S_{SA[n]}$, gdje $ S_i $ označava i-ti sufiks niza znakova S, te sadrži znakove S[i..n].
  
 \subsubsection{Burrows- Wheelerova transformacija (BWT)}
+\label{BWT_definicija}
 Burrows- Wheelerova transformacija pretvara niz znakova u sličan niz znakova BWT[1..n] sa istom abecedom. Koristi se za kompresiju podataka. Transformacija je reverzibilna bez dodatnih resursnih zahtjeva. Elemente transformiranog niza računamo formulom:
 
 \[
 BWT[i]=\begin{cases}
-S[SA[i]-1], & \text{ako } SA[i]\neq 1 &
+S[SA[i]-1], & \text{ako } SA[i]\neq 1 & 
 \$, & \text{inače}.
 \end{cases}
 \]
@@ -177,5 +178,67 @@ Prvo definiramo uzlazno poredanu abecedu $\Eta$kao niz znakova veličine $\sigma
 Zatim definiramo interval [1..r] kao podinterval abecede, r <= $\sigma$
 Za interval [1..r], niz znakova BWT[1..r] dobijemo tako da iz transformiranog niza znakova od S uklonimo sve znakove iz B-W transformacije koji ne pripadaju segmentu abecede [1..r]
 
+\section{Primjer rada algoritma}
+U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
+
+\subsection{Izgradnja sufiksnog polja}
+\begin{enumerate}
+\item Na kraj ulaznog niza dodaje se znak \$ te je sada S =  mississippi\$. U daljnjem tekstu vrijedi pretpostavka da je znak \$ abecedno manji od svih ostalih znakova od kojih je S izrađen.
+\item Svakom sufiksu niza S pridružuju se indeksi od 1 do \textit{n}, počevši od najduljeg. Ovo je prikazano u \textbf{tablici \ref{tableEx1}}
+
+\begin{table}
+\caption{Pridruživanje indeksa sufiksima niza S}
+\label{tableEx1}
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+i & S$_{SA}$[i] \\
+\midrule
+1 & mississippi\$ \\
+2 & ississippi\$ \\
+3 & ssissippi\$ \\
+4 & sissippi\$ \\
+5 & issippi\$ \\
+6 & ssippi\$ \\
+7 & sippi\$ \\
+8 & ippi\$ \\
+9 & ppi\$ \\
+10 & pi\$ \\
+11 & i\$ \\
+12 & \$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\item Sufiksno polje \(SA\) dobivamo soritiranjem dobivenih sufiksa leksikografski od najmanjeg prema najvećem. Ovo je prikazano u \textbf{tablici \ref{tableEx2}}.
+
+
+\begin{table}
+\caption{Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
+\label{tablePrimjer2}
+\begin{center}
+\begin{tabular}{rrl}
+\toprule
+i & SA[i] & S$_{SA}$[i] \\
+\midrule
+1 & 12 & \$ \\
+2 & 11 &  i\$ \\
+3 & 8 & ippi\$ \\
+4 & 5 & issippi\$ \\
+5 & 2 & ississippi\$ \\
+6 & 1 & misssissippi\$ \\
+7 & 10 & pi\$ \\
+8 & 9 & ppi\$ \\
+9 & 7 & sippi\$ \\
+10 & 4 & sissippi\$ \\
+11 & 6 & ssippi\$ \\
+12 & 3 & ssissippi\$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+Dobiveno je sufiksno polje SA = [13, 6, 8, 1, 11, 4, 7, 10, 3, 9, 2, 12, 5]
 
 \end{document}
