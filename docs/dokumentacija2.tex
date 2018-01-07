@@ -240,4 +240,34 @@ i & SA[i] & S$_{SA}$[i] \\
 \end{center}
 \end{table}
 
+\item Izračunava se Burrows-Wheelerova transformacija BWT[1..n] za dobiveno sufiksno polje SA prema formuli navedenoj u \ref{BWT_defincija} .  
+\newline Npr. BWT[4]=S[SA[4]-1]=S[5-1]=S[4]=s.
+
+Rezultat je prikazan u tablici \textbf{tablice \ref{tableEx3}}. 
+
+\begin{table}
+\caption{Burrows-Wheelerova tranformacija}
+\label{tableEx3}
+\begin{center}
+\begin{tabular}{rrll}
+\toprule
+i & SA[i] & S$_{SA}$[i] & BWT[i] \\
+\midrule
+1 & 12 & \$ & i \\
+2 & 11 &  i\$ & p \\
+3 & 8 & ippi\$ & s \\
+4 & 5 & issippi\$ & s \\
+5 & 2 & ississippi\$ & m \\
+6 & 1 & misssissippi\$ & \$ \\
+7 & 10 & pi\$ & p \\
+8 & 9 & ppi\$ & i \\
+9 & 7 & sippi\$ & s \\
+10 & 4 & sissippi\$ & s \\
+11 & 6 & ssippi\$ & i \\
+12 & 3 & ssissippi\$ & i \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
 \end{document}
