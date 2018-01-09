@@ -22,7 +22,7 @@
 	%------------------------------------------------
 	
 	\textsc{\LARGE SVEU\v{C}ILI\v{S}TE U ZAGREBU}\\[0.4cm] % Main heading such as the name of your university/college
-	\textsc{\LARGE \textbf{FAKULTET ELEKTROTEHNIKE I RA\v{C}UNALSTVA}}\\[2.5cm]
+	\textsc{\LARGE \textbf{FAKULTET ELEKTROTEHNIKE I RA\v{C}UNARSTVA}}\\[2.5cm]
     
 	\textsc{\Large Projekt iz Bioinformatike}\\[0.5cm] % Major heading such as course name
 	
@@ -170,6 +170,7 @@ S[SA[i]-1], & \text{ako } SA[i]\neq 1 &
 \newpage
 
 \subsubsection{Stablo valića}
+\label{WT_defincija}
 
 Stablo valića je struktura podataka koja rekurzivno particionira tok u 2 dijela sve dok su u svakom dijelu preostali homogeni podatci. Ime stabla je analogno valnoj transformaciji signala koji rekurzivno dekompresira signal prema frenkvencijama komponenti. 
 
@@ -269,5 +270,17 @@ i & SA[i] & S$_{SA}$[i] & BWT[i] \\
 \end{tabular}
 \end{center}
 \end{table}
+
+\item Iz dobivene Burrows-Wheelerove transformacije gradi se stablo valića opisanom u \ref{WT_definicija}. Prvo se stvara sortirana abeceda ulaznog niza koja je u ovom slučaju veličine 5 znakova ($\Sigma$[1..5]=\$imps). Korijen stabla čini bit vektor dobiven kodiranjem niza Burrows-Wheelerove transformacije dobivene u prethodnom koraku. Abeceda se potom dijeli na pola te dobivamo dva podniza, ovom slučaju: $\Sigma$[1..2]=\$i i $\Sigma$[3..5]=mps. Znakovi prve polovice u svakoj skupini kodiraju se vrijednošću 0, a ostali 1. Postupak se ponavlja sve dok se u čvoru ne nalaze samo jednaki znakovi koji čine listove stabla. Potpuno izgrađeno stablo za dani primjer prikazano je na slici \ref{fig:waveletTree}.
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=\columnwidth]{waveletTree.png}
+		\caption{Stablo valića za dani primjer}
+		\label{fig:waveletTree}
+	\end{center}
+\end{figure}
+
+\item Kontrukcija LCP polja...
 
 \end{document}
