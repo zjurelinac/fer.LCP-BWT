@@ -13,6 +13,7 @@
 \hypersetup{colorlinks=true, linkcolor=black, filecolor=black, urlcolor=black, citecolor=black}
 \usepackage{indentfirst}
 \graphicspath{ {img/} }
+\usepackage{enumerate}
 %\renewcommand{\familydefault}{\sfdefault}
 
 
@@ -108,7 +109,7 @@ Sufiksno polje sadrži sve sufikse od teksta S. Zamijenila je u toj zadaći sufi
 Sufiksno polje SA od niza znakova S je cjelobrojno polje u intervalu od 1 do n koje određuje leksikografski poredak svih n sufiksa niza znakova S. Preciznije, sufiksno polje zadovoljava $ S_{SA[1]} < S_{SA[2]} < ... < S_{SA[n]}$, gdje $ S_i $ označava i-ti sufiks niza znakova S, te sadrži znakove S[i..n].
  
 \subsubsection{Burrows- Wheelerova transformacija (BWT)}
-\label{BWT_definicija}
+\label{BWT_defincija}
 Burrows- Wheelerova transformacija pretvara niz znakova u sličan niz znakova BWT[1..n] sa istom abecedom. Koristi se za kompresiju podataka. Transformacija je reverzibilna bez dodatnih resursnih zahtjeva. Elemente transformiranog niza računamo formulom:
 
 %[
@@ -171,7 +172,7 @@ Burrows- Wheelerova transformacija pretvara niz znakova u sličan niz znakova BW
 \newpage
 
 \subsubsection{Stablo valića}
-\label{WT_defincija}
+\label{WT_definicija}
 
 Stablo valića je struktura podataka koja rekurzivno particionira tok u 2 dijela sve dok su u svakom dijelu preostali homogeni podatci. Ime stabla je analogno valnoj transformaciji signala koji rekurzivno dekompresira signal prema frenkvencijama komponenti. 
 
@@ -187,7 +188,7 @@ U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
 
 \begin{enumerate}
 	\item Na kraj ulaznog niza dodaje se znak \$ te je sada S =  mississippi\$. U daljnjem tekstu vrijedi pretpostavka da je znak \$ abecedno manji od svih ostalih znakova od kojih je S izrađen.
-	\item Svakom sufiksu niza S pridružuju se indeksi od 1 do \textit{n}, počevši od najduljeg. Ovo je prikazano u \textbf{tablici \ref{tableEx1}}
+	\item Svakom sufiksu niza S pridružuju se indeksi od 1 do \textit{n}, počevši od najduljeg. Ovo je prikazano u \textbf{tablici \ref{tableEx1}}.
 
 	\begin{table}
 		\caption{Pridruživanje indeksa sufiksima niza S}
@@ -220,7 +221,7 @@ U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
 
 	\begin{table}
 		\caption{Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
-		\label{tablePrimjer3}
+		\label{tableEx2}
 		\begin{center}
 			\begin{tabular}{rrl}
 				\toprule
@@ -286,40 +287,41 @@ U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
 
 	\item Pomoću Algoritama 1 i 2 iz rada Beller et al. (2013) gradi se polje najdužih zajedničkih prefiksa (LCP) u nekoliko koraka:
 	\begin{enumerate}
-		\item Inicijalizacija LCP polja i reda Q. Vrijednosti polja LCP se postavljaju na nevažeću (\textbf{NULL}) vrijednost, osim LCP[1] i LCP[n+1] koji se postavljaju na -1. U red Q stavljamo strukturu koja sadrži početni interval $I$ = [i..j]=[1..12] i broj \textit{l}=0 :
-	 	LCP = [-1,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
+		\item Inicijalizacija LCP polja i reda Q. Vrijednosti polja LCP se postavljaju na nevažeću (\textbf{NULL}) vrijednost, osim LCP[1] i LCP[n+1] koji se postavljaju na -1. U red Q stavljamo strukturu koja sadrži početni interval $I$ = [i..j]=[1..12] i broj \textit{l}=0 :\newline
+	 	LCP = [-1,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]\newline
 		Q = [<[1..12],0>]
 		\item Izračunavanje c$\omega$-intervala za interval dobiven uzimanjem elementa iz reda Q (FIFO) unutar funkcije \textit{getIntervals} iz Algoritma 1 Beller et al. (2013).
 			\begin{itemize}
-				\item \textit{c} - znak
-				\item \textit{C[c]} - zbroj rangova svih elemenata leksikografski sortirane abecede koji su manji od c
-			    \item \textit{i} - početak intervala
-			    \item \textit{j} - kraj intervala
+			\renewcommand\labelitemi{--}
+			    \item[] \textit{c} - znak
+			    \item[] \textit{C[c]} - zbroj rangova svih elemenata leksikografski sortirane abecede koji su manji od c
+			    \item[] \textit{i} - početak intervala
+			    \item[] \textit{j} - kraj intervala
 			    \item Funkcija \textit{rang(a,k)} vraća broj pojavljivanja znaka \textit{a} do \textit{k}-tog indeksa u polju. 
 			    \item Znakovi abecede iz intervala $I$ se sortiraju od najmanjeg prema najvećem. Ima onoliko c$\omega$-intervala koliko je i jedinstvenih znakova. Kako je abeceda za dani primjer $\Sigma[1..5]=\$imps$, traži se 5 c$\omega$-intervala.
 			    \item $C = [0,1,5,6,8]$
 			    \item Indeks početka intervala dobiva se po formuli \textit{rang}(c,i-1)+C[c]+1 Indeks kraja intervala dobiva se po formuli C[c]+\textit{rang}(c,j).
-			    \item U intervalu $I$ se nalaze svi znakovi abecede (\$,i,m,p,s). Za svaki od znakova računa se njegov interval prema formuli navedenoj iznad.
-			    \item a [\textit{rang}('\$',0)+C['\$']+1..C['\$']+\textit{rang}('\$',12)]=[0+0+1..+0+1]=[1..1]
-			    \item b [\textit{rang}('i',0)+C['i']+1..C['i']+\textit{rang}('i',12)]=[0+1+1..+1+4]=[2..5]
-			    \item c [\textit{rang}('m',0)+C['m']+1..C['m']+\textit{rang}('m',12)]=[0+5+1..+5+1]=[6..6]
-			    \item d [\textit{rang}('p',0)+C['p']+1..C['p']+\textit{rang}('p',12)]= [0+6+1..+6+2]=[7..8]
-			    \item e [\textit{rang}('s',0)+C['s']+1..C['s']+\textit{rang}('s',12)]=[0+8+1..+8+4]=[9..12]
+			    \item U intervalu $I$ se nalaze svi znakovi abecede (\$,i,m,p,s). Za svaki od znakova računa se njegov interval prema formuli navedenoj iznad.\newline
+			    \item[]  [\textit{rang}('\$',0)+C['\$']+1..C['\$']+\textit{rang}('\$',12)]=[0+0+1..+0+1]=[1..1]
+			    \item[]  [\textit{rang}('i',0)+C['i']+1..C['i']+\textit{rang}('i',12)]=[0+1+1..+1+4]=[2..5]
+			    \item[]  [\textit{rang}('m',0)+C['m']+1..C['m']+\textit{rang}('m',12)]=[0+5+1..+5+1]=[6..6]
+			    \item[]  [\textit{rang}('p',0)+C['p']+1..C['p']+\textit{rang}('p',12)]= [0+6+1..+6+2]=[7..8]
+			    \item[]  [\textit{rang}('s',0)+C['s']+1..C['s']+\textit{rang}('s',12)]=[0+8+1..+8+4]=[9..12]\newline
 			    \item Povratna vrijednost \textit{getIntervals}, prema tome, je lista c$\omega$-intervala: [[1..1],[2..5],[6..6],[7..8],[9..12]]
 				\item Za svaki od dobivenih intervala [\textit{lb .. rb}] se potom provjerava vrijednost LCP[\textit{rb}+1]. Ako je vrijednost tog polja \textbf{NULL} u red stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>], a na index \textit{rb}+1 vrijednost \textit{l}. Navedeni postupak se ponavlja sve dok u redu ima elemenata, a prva dva koraka prikazana su u nastavku.
-					\begin{enumerate}
-						\item LCP = [-1,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
-					    Q = [<[1..1],0>]
+					\begin{enumerate}[1.]
+						\item LCP = [-1,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]\newline
+					    Q = [<[1..1],0>]\newline\newline
 						[\textit{lb .. rb}] = [1..1], \textit{l} = 0
 						\newline
-						LCP[\textit{rb}+1]=LCP[2]=$\perp$ -> u red Q stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>] = [<[\textit{1..1}],1>], a LCP[\textit{rb}+1]=LCP[2]=0.
-						\item LCP = [-1,0,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
-					   	Q = [<[2..5],0>,<[1..1],1>]
+						LCP[\textit{rb}+1]=LCP[2]=$\perp$ -> u red Q stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>] = [<[\textit{1..1}],1>], a LCP[\textit{rb}+1]=LCP[2]=0.\newline
+						\item LCP = [-1,0,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]\newline
+					   	Q = [<[2..5],0>,<[1..1],1>]\newline\newline
 						[\textit{lb .. rb}] = [2..5], \textit{l} = 0
 						\newline
-						LCP[\textit{rb}+1]=LCP[6]=$\perp$ -> u red Q stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>] = [<[\textit{2..5}],1>], a LCP[\textit{rb}+1]=LCP[6]=0.
-						\item LCP = [-1,0,$\perp,\perp,\perp,$0$,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
-						Q = [<[6..6],0>,<[2..5],1>,<[1..1],1>]
+						LCP[\textit{rb}+1]=LCP[6]=$\perp$ -> u red Q stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>] = [<[\textit{2..5}],1>], a LCP[\textit{rb}+1]=LCP[6]=0.\newline
+						\item LCP = [-1,0,$\perp,\perp,\perp,$0$,\perp,\perp,\perp,\perp,\perp, \perp$, -1]\newline
+						Q = [<[6..6],0>,<[2..5],1>,<[1..1],1>]\newline\newline
 						[\textit{lb .. rb}] = [6..6], \textit{l} = 0
 						\newline (...)
 					\end{enumerate}
