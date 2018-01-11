@@ -8,22 +8,23 @@
 
 const int max_line_size = 80;
 
-std::string generate_input(const char* input_file, unsigned int N);
+std::string generate_input(const char* input_file, unsigned int N, bool protein_test = false);
 void output_results(const char* output_file, std::vector<int> LCP);
 int common_prefix(const char* a, const char* b);
 std::vector<int> calc_lcp(std::string genome, unsigned int N);
 
 int main(int argc, char* argv[]) {
     if(argc < 4) {
-        std::cout << "Usage: testgen test_size input_file output_file [--no-output]\n";
+        std::cout << "Usage: testgen test_size input_file (output_file | --no-output) [--protein-test]\n";
         return -1;
     }
     // Should generate output - allows skipping bruteforce output generating for large cases
-    bool gen_out = argc > 4 ? std::string(argv[4]) != "--no-output" : true;
+    bool gen_out = std::string(argv[3]) != "--no-output";
+    bool protein_test = argc > 4 ? std::string(argv[4]) == "--protein-test" : false;
 
     // Generating random input file
     unsigned int N = atoi(argv[1]);
-    std::string genome = generate_input(argv[2], N);
+    std::string genome = generate_input(argv[2], N, protein_test);
 
     if (gen_out)
         // Generating expected output file
@@ -50,18 +51,18 @@ std::vector<int> calc_lcp(std::string genome, unsigned int N) {
     return lcp;
 }
 
-std::string generate_input(const char* input_file, unsigned int N) {
+std::string generate_input(const char* input_file, unsigned int N, bool protein_test) {
     std::ofstream ifs(input_file);
     std::string genome(N + 1, '\0');
-    char alpha[] = "ACGT";
+    std::string alpha = protein_test ? "GALMFWKQESPVICYHRNDT" : "ACGT";
 
     srand(time(NULL));
 
-    ifs << ">Ex. temere, genome length = " << N;
+    ifs << ">Ex. temere, " << (protein_test ? "aminoacid" : "genome") << " sequence length = " << N;
     for (auto i = 0; i < N; ++i) {
         if (i % max_line_size == 0)
             ifs << std::endl;
-        ifs << (genome[i] = alpha[rand() % 4]);
+        ifs << (genome[i] = alpha[rand() % alpha.size()]);
     }
     ifs.close();
 

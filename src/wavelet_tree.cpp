@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <queue>
 #include <string>
 #include <utility>
@@ -78,32 +79,32 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
         bitvector bv;
         for (auto it = range.first; it != range.second; ++it)
             bv.push_back(*it > chr);
+        nodes.push_back(bv);
 
         std::stable_partition(range.first, range.second, [chr](auto x){ return x <= chr; });
         auto bound = std::upper_bound(range.first, range.second, chr);
-        nodes.push_back(bv);
 
-        if (alpha.second - alpha.first > 1) {
+        if (alpha.first < mid)
             work_queue.push(tmp_node(alpha_interval(alpha.first, mid), subseq(range.first, bound)));
+        if (mid < alpha.second)
             work_queue.push(tmp_node(alpha_interval(mid + 1, alpha.second), subseq(bound, range.second)));
-        }
     }
 }
 
-// 
+//
 // Internal node binary-rank query
 //
 // Returns the number of occurences of `bit` in a given range of the wavelet-tree node's bitvector.
 //  Method is used internally in the `get_intervals` algorithm. More precisely, it returns both the
 //  number of `bit`'s in interval [0, range.start-1] and the number of `bit`'s in [0, range.end]
-//  -> the difference between the two gives the actual result. 
+//  -> the difference between the two gives the actual result.
 //
 // @param node      - Wavelet-tree internal node's index
 // @param range     - Search range
 // @param bit       - Bit value that is searched, true | false
 //
 // Complexity: O(C) - constant
-// 
+//
 // Example:
 //      lb::sequence in = "s$nnaaa";
 //      lb::alphabet a(in);
@@ -113,12 +114,12 @@ lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : 
 //          //
 //          //               0
 //          //            s$nnaaa
-//          //         /           \ 
+//          //         /           \
 //          //        1             2
 //          //      $aaa           snn
-//          //    /      \       /     \ 
+//          //    /      \       /     \
 //          //   3        4     5       6
-//          //   $       aaa   nn       s 
+//          //   $       aaa   nn       s
 //
 //      auto res = wt.node_rank(1, interval(1, 2), true);   // res = [1-rank(wt.nodes[node].bv, [0, 0]), 1-rank(wt.nodes[node].bv, [0, 2])]
 //          // res <= [0, 2]
@@ -132,7 +133,7 @@ lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bo
 //
 // Wavelet tree rank query
 //
-// Returns the number of occurences of a given symbol up to the `index`-th place (excluded) in the 
+// Returns the number of occurences of a given symbol up to the `index`-th place (excluded) in the
 //  input string upon which the wavelet tree was built.
 //
 // @param index     - Rank query boundary - method will return `symbol`-rank of [0, index-1] interval
@@ -145,7 +146,7 @@ lb::interval lb::wavelet_tree::node_rank(lb::size_t node, lb::interval range, bo
 //      lb::alphabet a(in);
 //      lb::wavelet_tree wt(in, a);
 //      auto num_a = wt.rank(3, 'a');   // num_a = number of 'a' symbols
-//          // num_a <= 2 
+//          // num_a <= 2
 //
 lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) const {
     const int N = nodes.size();

@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/lcp_bwt",
-            "args": ["./tests/data/auto-test_20.1.in", "./tests/out/manual.1.out"],
+            "args": ["./tests/data/auto-test_100-protein.1.in", "./tests/out/manual.1.out"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

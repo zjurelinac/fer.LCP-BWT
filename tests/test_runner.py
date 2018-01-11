@@ -24,19 +24,19 @@ def cmp_files(filename1, filename2):
     return contents1 == contents2
 
 
-def generate_tests(sizes):
+def generate_tests(sizes, protein_test=False):
     print('\nGenerating test cases...')
     print('=' * 40)
 
     for size in sizes:
-        key = 'auto-test_%s' % size
+        key = 'auto-test_%s%s' % (size, '-protein' if protein_test else '')
         max_id = max([int(t.rsplit('.', 2)[1]) for t in glob.glob('%s/%s.*.in' % (TESTS_PATH, key))] or [0])
         test_name = os.path.join(TESTS_PATH, '%s.%d' % (key, max_id + 1))
         test_in, test_out = test_name + '.in', test_name + '.out'
 
-        params = ['./testgen', size, test_in, test_out]
-        if int(size) > MAX_BRUTE_SIZE:
-            params.append('--no-output')
+        params = ['./testgen', size, test_in, test_out if int(size) <= MAX_BRUTE_SIZE else '--no-output']
+        if protein_test:
+            params.append('--protein-test')
 
         subprocess.run(params)
         print(size, '::', test_in, test_out)
@@ -92,13 +92,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="LCP-BWT implementation test runner.")
     parser.add_argument('-t', '--test', action='store_true', default=False, help="Run all tests and output the results")
     parser.add_argument('-g', '--gen', nargs='+', help="Generate test cases having given sizes")
+    parser.add_argument('-p', '--protein-tests', default=False, action='store_true', help="Instead of DNA, generate aminoacid protein sequences")
     parser.add_argument('-a', '--analyze', default=None, help="Analyze execution time and resource consumption on a given test case name")
     args = parser.parse_args()
 
     print('LCP-BWT implementation test runner, version 0.1')
 
     if args.gen:
-        generate_tests(args.gen)
+        generate_tests(args.gen, args.protein_tests)
 
     if (not args.gen and not args.analyze) or args.test:
         run_tests()
