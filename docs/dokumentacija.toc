@@ -3,7 +3,12 @@
 \contentsline {section}{\numberline {2}Algoritmi}{3}{section.2}
 \contentsline {subsection}{\numberline {2.1}Podatkovne strukture}{3}{subsection.2.1}
 \contentsline {subsubsection}{\numberline {2.1.1}Sufiksno polje}{3}{subsubsection.2.1.1}
-\contentsline {subsubsection}{\numberline {2.1.2}Burrows- Wheelerova transformacija (BWT)}{3}{subsubsection.2.1.2}
+\contentsline {subsubsection}{\numberline {2.1.2}Burrows-Wheelerova transformacija (BWT)}{3}{subsubsection.2.1.2}
 \contentsline {subsubsection}{\numberline {2.1.3}Stablo vali\IeC {\'c}a}{5}{subsubsection.2.1.3}
 \contentsline {section}{\numberline {3}Primjer rada algoritma}{5}{section.3}
-\contentsline {subsection}{\numberline {3.1}Izgradnja sufiksnog polja}{5}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.1}Izgradnja sufiksnog polja}{6}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Burrows-Wheelerova transformacija}{6}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Izgradnja LCP niza}{8}{subsection.3.3}
+\contentsline {section}{\numberline {4}Rezultati}{10}{section.4}
+\contentsline {section}{\numberline {5}Zaklju\IeC {\v c}ak}{11}{section.5}
+\contentsline {section}{\numberline {6}Literatura}{12}{section.6}
