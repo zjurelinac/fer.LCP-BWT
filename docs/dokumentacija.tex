@@ -1,5 +1,4 @@
 \documentclass[a4paper,12pt]{article}
-%\usepackage[left=3cm,right=2cm,top=3cm,bottom=3cm,nohea dfoot]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[croatian]{babel}
 \usepackage[T1]{fontenc}
@@ -15,9 +14,14 @@
 
 \usepackage[nottoc, numbib, chapter]{tocbibind}
 \usepackage[authoryear, round]{natbib}
-
+\usepackage{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
 \usepackage{booktabs}
 \usepackage{mathpazo}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
 \pretolerance=150
 
 \begin{document}
@@ -67,39 +71,35 @@
 
 \section{Uvod}
 
-Bioinformatika je grana znanosti koja usko povezuje biologiju i računarstvo, a ubrzano se razvijala zadnja dva desetljeća. Pojeftinjenje i sve veća dostupnost tehnologije sekvenciranja rezultirale su stvaranjem velikih skupova bioloških podataka. Često se kao zadatak u bioinformatici nameće analiza sekvence genoma. Pošto su te sekvence predugačke za uobičajenu pohranu i analizu, potrebno je koristiti posebna, prilagođene strukture podataka kao što su sufiksna polja i polja najdužih zajedničkih prefiksa. 
+Bioinformatika je grana znanosti koja usko povezuje biologiju i računarstvo, a ubrzano se razvijala zadnja dva desetljeća. Pojeftinjenje i sve veća dostupnost tehnologije sekvenciranja rezultirale su stvaranjem velikih skupova bioloških podataka. Često se kao zadatak u bioinformatici nameće analiza sekvence genoma. Pošto su te sekvence predugačke za uobičajenu pohranu i analizu, potrebno je za to koristiti posebne, prilagođene strukture podataka, kao što su sufiksna polja i polja najdužih zajedničkih prefiksa. 
 
-Cilj projekta je bio čim učinkovitije implementirati algoritme 1 i 2 iz rada \cite{beller2013}, koristeći pritom gotovu knjižnicu za izgradnju sufiksnog polja, te potom ostvarenu implementaciju usporediti s originalnom, ali i s rezultatima prošlogodišnjeg studentskog tima, koji su opisani u njihovu radu \cite{studenti2017}. Za usporedbu rezultata korišteni su sintetski podaci različitih duljina, kao i sekvenca genoma bakterije E. coli.
+Cilj projekta je bio čim učinkovitije implementirati algoritme 1 i 2 iz rada \cite{beller2013}, koristeći pritom gotovu knjižnicu za izgradnju sufiksnog polja, te potom ostvarenu implementaciju usporediti s originalnom, ali i s rezultatima prošlogodišnjeg studentskog tima, koji su opisani u njihovu radu \cite{studenti2017}. Za usporedbu rezultata korišteni su sintetski podaci različitih duljina i abeceda (sekvence DNA i aminokiselina), kao i sekvence genoma bakterije E. coli.
 
 \newpage
 
 \section{Algoritmi}
-\textbf{TODO: Correct!}
-U problemima analiza sekvenci vrlo često se javlja potreba za izračunom najduljeg zajedničkog prefiksa (LCP). U tu svrhu koriste sufiksni nizovi koji spremaju u listu spremaju sve moguće sufikse sekvence, od duljine 1 do najdulje. Iz sufiksnog niza dobiva se LCP polje u linearnom vremenu. 
-Veliki resursni zahtjevi analize senkvenci DNK nameću zahtjeve za korištenjem podatkovnih struktura koje koriste manje memorijskog prostora. Iz te potrebe razvijeno je stablo valića niza transformiranog Burrows- Wheelerovom transformacijom (BWT).
-Metoda je sljedeća: sekvenca se prvo podliježe Burrows- Wheelerovoj transformaciji, potom se transformirana sekvenca sprema u stablo valića. Stablo valića podržava pretraživanje unatrag po originalnom nizu pa tako dobivamo tražene sufikse. Opisani algoritam ima složenost $O(n\log\sigma)$, gdje je $\sigma$ veličina abecede.
+U primjenama bioinformatike na analizu DNA i proteinskih sekvenci često se u sklopu nekog algoritma javlja potreba za poznavanjem vrijednosti polja najdužih zajedničkih prefiksa. To pomoćno polje usko je vezano za tzv. sufiksno polje, koje u sebi pohranjuje sortirani poredak svih sufiksa početnog niza, i iz njega se može konstruirati u linearnom vremenu.
 
-\subsection{Podatkovne strukture}
+Veliki resursni zahtjevi koji su često prisutni pri analizi DNA i proteinskih sekvenci stvaraju potrebu korištenja podatkovnih struktura koje su optimizirane za što manje memorijsko zauzeće, a jedna od takvih je i stablo valića. Ono predstavlja memorijski kompaktan indeks originalnog niza i omogućava pretraživanje unatrag po njemu, a između ostaloga, stablo valića koristi se i pri ovdje opisanoj konstrukciji polja najduljih zajedničkih prefiksa.
 
-\subsubsection{Sufiksno polje}
-\textbf{TODO: Correct!}
-Sufiksno polje sadrži sve sufikse od teksta S. Zamijenila je u toj zadaći sufiksno stablo jer koristi manje memorije od sufiksnog stabla za istu zadaću. Sufiksno polje se pokazalo kao vrlo važan alat u raspoznavanju i analizi teksta, bioinformatici i drugim primjenama. 
-Sufiksno polje SA od niza znakova S je cjelobrojno polje u intervalu od 1 do n koje određuje leksikografski poredak svih n sufiksa niza znakova S. Preciznije, sufiksno polje zadovoljava $ S_{SA[1]} < S_{SA[2]} < ... < S_{SA[n]}$, gdje $ S_i $ označava i-ti sufiks niza znakova S, te sadrži znakove S[i..n].
- 
-\subsubsection{Burrows-Wheelerova transformacija (BWT)}
-%\label{BWT_definicija}
-Burrows- Wheelerova transformacija pretvara niz znakova u sličan niz znakova BWT[1..n] sa istom abecedom. Koristi se za kompresiju podataka. Transformacija je reverzibilna bez dodatnih resursnih zahtjeva. Elemente transformiranog niza računamo formulom:
+Metoda izgradnje željenog polja najduljih zajedničkih prefiksa je sljedeća:
+\begin{enumerate}
+	\item Izračuna se sufiksno polje originalnog niza (npr. DNA sekvence)
+	\item Na temelju sufiksnog polja odredi se Burrows-Wheelerova transformacija ulaza
+	\item Nad Burrows-Wheelerovom transformacijom izgradi se stablo valića
+	\item Korištenjem stabla valića te algoritama 1 i 2 iz rada \cite{beller2013}, konstruira se polje najduljih zajedničkih prefiksa
+\end{enumerate}
 
-$$
-BWT[i]=
-\begin{cases}
-S[SA[i]-1], & \text{ako} \  SA[i]\neq 1\\ 
-\$, & \text{inače}.
-\end{cases}
-$$
- 
+Opisani algoritam izračunava polje najduljih zajedničkih prefiksa u  sveukupnoj vremenskoj složenosti $O(n\log\sigma)$ (gdje je $n$ duljina ulaznog niza, a $\sigma$ veličina njegove abecede), što ga čini vrlo učinkovitim za danu primjenu.
+
+\subsection{Sufiksno polje}
+
+Sufiksno je polje struktura podataka koja u sebi sadrži sortirani poredak svih sufiksa početnog niza. Sufiksno se polje može shvatiti kao implicitan zapis sufiksnog stabla koji, pružajući iste funkcionalnosti kao i sufiksno stablo, pritom zauzima i znatno manje memorije, što je važan faktor u obradi velikih količina podataka. Sufiksno se polje pokazalo vrlo korisnim alatom u raspoznavanju i analizi teksta i tekstu-sličnih podataka, kako u bioinformatici tako i u brojnim drugim područjima. 
+
+Konkretno, sufiksno polje $SA_S$ niza znakova $S$ je polje cijelih brojeva iz intervala $1..N$ koji predstavljaju leksikografski poredak svih sufiksa niza $S$. Preciznije, svi članovi sufiksnog polja zadovoljavaju izraz $ S_{SA[1]} < S_{SA[2]} < ... < S_{SA[n]}$, gdje $ S_i $ označava i-ti sufiks niza znakova S, te sadrži znakove $S[i..n]$.
+
 \begin{table}[h!]
-	\caption{Pridruživanje indeksa sufiksima niza S, počevši od najduljeg.}
+	\caption{Svi sufiksi niza $S = abrakadabra$, od najdužeg do najkraćeg:}
 	\label{tablePrimjer1}
 	\begin{center}
 		\begin{tabular}{ll}
@@ -123,8 +123,21 @@ $$
 	\end{center}
 \end{table}
 
+\subsection{Burrows-Wheelerova transformacija (BWT)}
+Burrows-Wheelerova transformacija na reverzibilan način preuređuje ulazni niz znakova $S$ u niz jednake duljine $BWT_S[1..N]$, koji ima svojstvo da se slični znakovi nalaze blizu jedni drugih. To je svojstvo korisno primjerice pri kompresiji podataka, što BWT transformaciju čini učestalom upravo u takvim primjenama.
+
+Redoslijed elemenata u preuređenm nizu određuje se korištenjem sufiksnog polja prema formuli:
+
+$$
+BWT[i]=
+\begin{cases}
+S[SA[i]-1], & \text{ako} \  SA[i]\neq 1\\ 
+\$, & \text{inače}.
+\end{cases}
+$$
+
 \begin{table}[h!]
-	\caption{Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
+	\caption{Sufiksno polje ulaznog niza $S = abrakadabra$, kao i rezultat primjene Burrows-Wheelerove transformacije nad njime}
 	\label{tablePrimjer2}
 	\begin{center}
 		\begin{tabular}{rrll}
@@ -146,13 +159,14 @@ $$
 			\bottomrule
 		\end{tabular}
 	\end{center}
-\end{table}
+\end{table} 
 
 \newpage
 
-\subsubsection{Stablo valića}
-\label{WT_defincija}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Stablo valića}
+\textbf{TODO:Correct all!}
 Stablo valića je struktura podataka koja rekurzivno particionira tok u 2 dijela sve dok su u svakom dijelu preostali homogeni podatci. Ime stabla je analogno valnoj transformaciji signala koji rekurzivno dekompresira signal prema frenkvencijama komponenti. 
 
 Stablo valića može efikasno raditi upite rank i select nad nizovima proizvoljnih abeceda. To nam omogućuje pretraživanje unatrag u vremenskoj složenosti od  $O(\log\sigma)$ po koraku.
@@ -160,10 +174,76 @@ Prvo definiramo uzlazno poredanu abecedu $\eta$ kao niz znakova veličine $\sigm
 Zatim definiramo interval [1..r] kao podinterval abecede, r <= $\sigma$
 Za interval [1..r], niz znakova BWT[1..r] dobijemo tako da iz transformiranog niza znakova od S uklonimo sve znakove iz B-W transformacije koji ne pripadaju segmentu abecede [1..r]. Stablo valića niza znakova BWT izgrađeno nad abecedom $\eta$[1..$sigma$] je balansirano binarno stablo pretraživanja. Stablo se sastoji od čvorova, a svaki čvor v odgovara nizu znakova $BWT^{[l..r]}$, gdje je [l..r] abecedni interval. Korijen stabla odgovara nizu znakova BWT = $BWT^{[1..\sigma]}$. Ako je l=r, onda taj čvor $v$ nema djece. Inače, svaki čvor $v$ ima dvoje djece: lijevo dijete koje odgovara nizu znakova $BWT^{[l..m]}$, i desno dijete odgovara nizu znakova $BWT^{[m+1..r]}$, gdje je $\left \lceil{\frac{l+r}{2}}\right \rceil$. U ovom slučaju $v$ sadrži bit vektor $B^{[l..r]}$, čiji je i-ti element 0 ako je i-ti znak u $BWT^{[l..r]}]$ iz pod- abecede $\eta$[1..m], a 1 ako je iz pod abecede $\eta$[m+1..r]. Drugim riječima, ako traženi znak pripada lijevom podstablu, element bit vektora je 0, a ako pripada desnom podstablu, onda je element bit vektora 1. Za svaki vektor B potrebno je napraviti predprocesiranje na način da se upiti $rank_0(B,i)$ i $rank_1(B,i)$ mogu odgovoriti u konstantnom vremenu, gdje $rank_b(B,i)$ predstavlja broj pojavljivanja bita $b$ u B[1..i]. Stablo valića ima visinu $O(log\sigma)$. S obzirom da je u implementaciji dovoljno spremiti samo bit vektore, stablo valića zahtijeva samo nlog $\sigma$ bitova prostora i $O(n*log\sigma)$ bitova za podatkovne strukture koje podržavaju rang upite u konstantnom vremenu.  
 
-\section{Primjer rada algoritma}
-U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Izgradnja sufiksnog polja}
+\subsection{Algoritmi 1 i 2}
+\textbf{TODO:Correct all!}
+Autori u radu \cite{beller2013} koriste dva algoritma kako bi izgradili LCP polje i naš osnovni zadatak unutar ovog projekta bio je upravo implementacija tih dvaju algoritama.
+Prema prvom algoritmu koji su autori predložili, za jedan $\omega$-interval[i..j], funkcija \textit{getIntervals([i..j])} vraća listu svih \textit{c$\omega$}-intervala. To ustvari znači da se unutar intervala [i..j] pronađu svi znakovi abecede $\Sigma$, koji se potom poredaju leksikografski te se za svaki od znakova računa njegov $\omega$-interval. Na poslijetku, funkcija vraća onoliko c$\omega$ intervala koliko ima jedinstvenih znakova u intervalu [i..j].
+Postupak započinje $\omega$ intervalom [i..j] u korijenu stabla valića te se nastavlja spuštati u dubinu (kao DFS (engl. \textit{depth-first search}) algoritam).
+Dok se nalazi u trenutnom čvoru, algoritam postavlja rang upit stablu valića (složenost upita je konstantna!), kako bi došao do broja b$_{0}$ - a$_{0}$. Taj broj predstavlja nule u bit vektoru trenutnog čvora \textit{v} unutar trenutnog intervala. Ako je ta vrijednost pozitivna u BWT[i..j] se nalaze znakovi koji pripadaju lijevom podstablu čvora \textit{v} i algoritam nastavlja rekurzivno pozivanje unutar lijevog djeteta čvora \textit{v}. Isto tako, ako je broj jedinica pozitivan (b$_1$ - a$_1$), onda se algoritam nastavlja odvijati u desnoj grani. Algoritam se zaustavlja kad se za trenutni interval [p..q] dosegne list stabla koji odgovara znaku \textit{c}. Tada je c$\omega$-interval [C[c]+p..C[c]+q], gdje je C[c] zbroj rangova svih elemenata iz poredane abecede koji su leksikografski manji od znaka c. Vremenska složenost ovog postupka je $O$(\textit{k}log$\sigma$), gdje je k duljina liste c$\omega$-intervala.
+
+Kao što je već rečeno, \textbf{algoritam 2} se oslanja na algoritam 1. Svi elementi polja LCP[1..n+1] se inicijalno postavljaju na neku nemoguću vrijednost, npr. $\perp$, osim prvog i zadnjeg elementa koji poprimaju vrijednost -1. Jedan red (engl. \textit{queue}) sadržava parove (interval,\textit{l}). Na početku rada algoritma u redu se nalazi samo interval [1..n], a \textit{l} vrijednost je postavljena na 0. Algoritam potom skida iz reda interval (po principu FIFO, dok god se red ne isprazni), te pozivom metode \textit{getIntervals} prvog algoritma dobiva listu c$\omega$-intervala za dani interval. Za svaki interval [lb..rb] iz liste c$\omega$-intervala gleda se je li vrijednost polja LCP[rb+1] nepostavljena (iznosi $\perp$) te ako jest, taj interval [lb..rb] se dodaje u red, a njegova \textit{l} vrijednost se povećava za 1 u odnosu na \textit{l} vrijednost intervala koji je posljednji skinut iz reda. Također, vrijednost LCP[rb+1] se postavlja na tu posljednju \textit{l} vrijednost. 
+
+\begin{algorithm}[H]
+	\caption{prema \cite{beller2013}}
+	\label{alg1}
+	\begin{algorithmic}
+		\Function{getIntervals}{[i..j]}
+			\State $list \gets$ []
+			\State getIntervals'([i..j],[1..$\sigma$],list)
+			\State \Return $list$
+		\EndFunction
+
+		\Function{getIntervals'}{[i..j],[l..r],list}
+			\If {$l = r$}
+				\State $c \gets \Sigma[l]$
+				\State $add(list, [C[c]+i..C[c]+j)$ 
+			\Else
+				\State $(a_0,b_0) \gets (rank_0(B^{[l..r]},i-1),rank_0(B^{[l..r]},j))$
+				\State $(a_1,b_1) \gets (i-1-a_0,j-b_0)$
+				\State $m \gets \lfloor\frac{l+r}{2}\rfloor$ 
+				\If {$b_0 > a_0$}
+					\State \textit{getIntervals'}([a$_0$+1..b$_0$],[l..m],list)
+				\EndIf
+				\If{$b_1 > a_1$}
+					\State \textit{getIntervals'}([a$_1$+1...b$_1$],[m+1..r],list)
+				\EndIf
+			\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{algorithm}[H]
+	\caption{prema \cite{beller2013}}
+	\label{alg2}
+	\begin{algorithmic}
+		\State inicijalizacija polja LCP[1..n+1]  /* npr. LCP[i]=$\perp$ za sve $1 \leq i \leq n+1$ */
+		\State LCP[1] $\gets$ -1; LCP[n+1] $\gets$ -1
+		\State inicijaliziraj prazni red
+		\State dodaj (<[1..n],0>) u red q
+		\While{q nije prazan}
+			\State <[i..j],$l$> $\gets q.pop()$
+			\State list $\gets$ \textit{getIntervals}([i..j])
+			\For{\textbf{each}\texttt{[lb..rb] \textbf{in} \textit{list}}}
+				\If{LCP[rb+1]=$\perp$}
+					\State $q.push(<[lb..rb],l+1>)$
+					\State LCP[rb+1] $\gets l$
+				\EndIf
+			\EndFor
+		\EndWhile
+	\end{algorithmic}
+\end{algorithm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Primjer rada algoritma}
+U nastavku je dan primjer rada algoritma na stringu S = mississippi.
+
+\subsubsection{Izgradnja sufiksnog polja}
 
 \begin{enumerate}
 	\item Na kraj ulaznog niza dodaje se znak \$ te je sada S =  mississippi\$. U daljnjem tekstu vrijedi pretpostavka da je znak \$ abecedno manji od svih ostalih znakova od kojih je S izrađen.
@@ -199,7 +279,7 @@ U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
 	Dobiveno je sufiksno polje SA = [12, 11, 8, 5, 2, 1, 10, 9, 7, 4, 6, 3]
 
 	\begin{table}[h!]
-		\caption{Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
+		\caption{\textbf{TODO: Correct!}Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
 		\label{tablePrimjer3}
 		\begin{center}
 			\begin{tabular}{rrl}
@@ -224,12 +304,12 @@ U nastavku dokumenta dan je primjer rada algoritma na stringu S = mississippi.
 	\end{table}
 \end{enumerate}
 
-\subsection{Burrows-Wheelerova transformacija}
+\subsubsection{Burrows-Wheelerova transformacija}
 
-Izračunava se Burrows-Wheelerova transformacija BWT[1..n] za dobiveno sufiksno polje SA prema formuli navedenoj u \ref{BWT_defincija} .  
+Izračunava se Burrows-Wheelerova transformacija BWT[1..n] za dobiveno sufiksno polje SA prema prethodno navedenoj formuli.
 Npr. $$BWT[4]=S[SA[4]-1]=S[5-1]=S[4]=s.$$
 
-Rezultat je prikazan u tablici \textbf{tablice \ref{tableEx3}}. 
+Rezultat je prikazan u tablici \ref{tableEx3}. 
 
 \begin{table}[h!]
 	\caption{Burrows-Wheelerova tranformacija}
@@ -256,10 +336,10 @@ Rezultat je prikazan u tablici \textbf{tablice \ref{tableEx3}}.
 	\end{center}
 \end{table}
 
-\subsection{Izgradnja LCP niza}
-
+\subsubsection{Izgradnja LCP niza}
+\textbf{TODO: Correct!}
 \begin{enumerate}
-	\item Iz dobivene Burrows-Wheelerove transformacije gradi se stablo valića opisanom u \ref{WT_definicija}. Prvo se stvara sortirana abeceda ulaznog niza koja je u ovom slučaju veličine 5 znakova ($\Sigma$[1..5]=\$imps). Korijen stabla čini bit vektor dobiven kodiranjem niza Burrows-Wheelerove transformacije dobivene u prethodnom koraku. Abeceda se potom dijeli na pola te dobivamo dva podniza, ovom slučaju: $\Sigma$[1..2]=\$i i $\Sigma$[3..5]=mps. Znakovi prve polovice u svakoj skupini kodiraju se vrijednošću 0, a ostali 1. Postupak se ponavlja sve dok se u čvoru ne nalaze samo jednaki znakovi koji čine listove stabla. Potpuno izgrađeno stablo za dani primjer prikazano je na slici \ref{fig:waveletTree}.
+	\item Iz dobivene Burrows-Wheelerove transformacije gradi se stablo valića. Prvo se stvara sortirana abeceda ulaznog niza koja je u ovom slučaju veličine 5 znakova ($\Sigma$[1..5]=\$imps). Korijen stabla čini bit vektor dobiven kodiranjem niza Burrows-Wheelerove transformacije dobivene u prethodnom koraku. Abeceda se potom dijeli na pola te dobivamo dva podniza, ovom slučaju: $\Sigma$[1..2]=\$i i $\Sigma$[3..5]=mps. Znakovi prve polovice u svakoj skupini kodiraju se vrijednošću 0, a ostali 1. Postupak se ponavlja sve dok se u čvoru ne nalaze samo jednaki znakovi koji čine listove stabla. Potpuno izgrađeno stablo za dani primjer prikazano je na slici \ref{fig:waveletTree}.
 
 	\begin{figure}
 		\begin{center}
@@ -316,8 +396,27 @@ Rezultat je prikazan u tablici \textbf{tablice \ref{tableEx3}}.
 \end{enumerate}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Rezultati}
 
+Prethodno opisani algoritam uspješno je implementiran i ispitan u sklopu ovoga rada, a njegove su performanse uspoređene s originalnom implementacijom autora rada \cite{beller2013} i prošlogodišnjom studentskom implementacijom opisanom u radu \cite{studenti2017}.
+
+Točnost algoritma provjerena je na tri skupine sintetskih podataka različitih veličina abecede -- slučajno generiranim sekvencama DNA i aminokiselina, te na poznatom nasumičnom latinskom tekstu \textit{lorem ipsum}. Duljine ispitnih podataka bile su u rasponu od $20$ do $25000$ ulaznih znakova, a provjera je vršena usporedbom s točnim rješenjima određenima naivnim algoritmom koji radi u kvadratnoj složenosti.
+
+Usporedba performansi vršena je na skupovima sintetskih DNA podataka u rasponu duljina od $100.000$ do $20.000.000$ ulaznih znakova, a vremena izvršavanja i zauzeća memorije određena su korištenjem pomoćnog Linux programa \texttt{time -a \textit{program [argumenti]}}, koji svojim pokretanjem iz naredbene ljuske pokreće i ciljani program, te korištenjem sustavskih poziva prema jezgri mjeri njegove performanse.
+
+Budući da nijedna od postojećih i trenutno javno dostupnih implementacija stabla valića ne podržava operacije potrebne opisanim algoritmima (konkretno algoritmu 1), načinjena je vlastita implementacija istoga, te su svi testovi provedeni koristeći nju. Konstrukcija sufiksnog polja je pak izvršena javno dostupnom bibliotekom \texttt{sais}, točnije njenom C++ varijantom \texttt{saisxx}.
+
+Performanse ovdje opisane implementacije u početnoj izvedbi nisu bile dovoljno dobre, te je stoga izrađena i vlastita izvedba tzv. bitvektora (na kojima se temelji stablo valića), koja je svojom strukturom i operacijama posebno optimizirana za brzo odgovaranje na rang upite, pri tome koristeći kumulativne sume i brze procesorske operacije za brojanje bitova (\texttt{popcount} instrukcije). Nakon te, kao i još nekolicine manjih optimizacija, performanse algoritma značajno su porasle, te se u trenutnom stanju mogu ravnopravno mjeriti čak i s originalnom implementacijom.
+
+Važno je doduše napomenuti da iz nepoznatih razloga čak ni nakon dugotrajnih pokušaja nije bilo moguće na vlastitim računalima na zadovoljavajući način pokrenuti originalnu implementaciju algoritma i izmjeriti njene performanse, jer su dobivani rezultati bili očigledno neispravni, pa su stoga i odbačeni kao takvi. Zato su podaci o trajanju izvršavanja i zauzeću memorije preuzeti i interpolirani iz prošlogodišnjeg rada, uzimajući kao faktore pretvorbe omjere $T_{prosl.impl.}/T_{orig.impl.}$ i $M_{prosl.impl.}/M_{orig.impl.}$. S tim su faktorima potom podijeljena vremena izvršavanja i zauzeća memorije rješenja iz rada \cite{studenti2017}, koja su bila uspješno pokrenuta, i na taj su način dobivene približne vrijednosti performansi implementacije \cite{beller2013}.
+
+Svi izmjereni (i interpolirani) rezultati prikazani su u tablicama \ref{tableTimeComp} i \ref{tableMemComp}, kao i u grafovima \ref{fig:graphTime} i \ref{fig:graphMem}.
+
+\subsection{Usporedba trajanja izvođenja}
+
+Iz prikazanih rezultata trajanja izvođenja na raznim veličinama ulaza vidljivo je da su performanse svih implementacija približno linearne (za istu ulaznu abecedu), što odgovara teoretskoj složenosti algoritma. No također je uočljivo i da se implementacije međusobno značajno razlikuju po stvarnim vremenima izvođenja, i to na način da je prošlogodišnja studentska implementacija po performansama najlošija, dok su originalna i naša implementacija otprilike podjednake, a čak je možda prisutna i mala prednost na strani naše, no moguće je također i da je to samo posljedica nedovoljno precizne interpolacije vrijednosti.
 
 \begin{table}[h!]
 	\caption{Rezultati usporedbe vremena izvođenja algoritama}
@@ -352,11 +451,16 @@ Rezultat je prikazan u tablici \textbf{tablice \ref{tableEx3}}.
 \begin{figure}[h!]
 	\begin{center}
 		\includegraphics[width=\columnwidth]{timeGraph.png}
- 		\caption{Grafički prikaz usporedbe vremena izvođenja različitih implementacija algoritama, prema podacima iz tablice \ref{tableTimeComp}. Sivom bojom prikazana je ovdje opisana implementacija.}
+ 		\caption{Grafički prikaz usporedbe vremena izvođenja različitih implementacija algoritama, prema podacima iz tablice \ref{tableTimeComp}.}
  		\label{fig:graphTime}
 	\end{center}
 \end{figure}
 
+
+\clearpage
+\subsection{Usporedba zauzeća memorije}
+
+Rezultati mjerenja zauzeća memorije pojedinih implementacija, prikazani u tablici \ref{tableMemComp}, ukazuju na to da prošlogodišnje rješenje za svoj rad zahtjeva značajno više memorije od ostala dva -- otprilike 3 puta više od naše implementacije, i čak 4 puta više od originalne, a razlog tome najvjerojatnije je nekonzervativna uporaba memorije u implementaciji stabla valića koja se u tom rješenju koristi. Naša implementacija, kao što je iz prikazanih podataka vidljivo, nema pati od takvih nedostataka, pa su i njene performanse mnogo bliže onima iz originalnog rada, iako ih još ne uspijeva sasvim dostići.
 
 \begin{table}[h!]
 	\caption{Rezultati usporedbe vremena izvođenja algoritama}
@@ -391,20 +495,22 @@ Rezultat je prikazan u tablici \textbf{tablice \ref{tableEx3}}.
 \begin{figure}[h!]
 	\begin{center}
 		\includegraphics[width=\columnwidth]{memoryGraph.png}
- 		\caption{Grafički prikaz usporedbe memorijskog zauzeća različitih implementacija algoritama, prema podacima iz tablice \ref{tableMemComp}. Sivom bojom prikazana je ovdje opisana implementacija.}
- 		\label{fig:graphMemory}
+ 		\caption{Grafički prikaz usporedbe memorijskog zauzeća različitih implementacija algoritama, prema podacima iz tablice \ref{tableMemComp}.}
+ 		\label{fig:graphMem}
 	\end{center}
 \end{figure}
 
+\clearpage
 \section{Zaključak}
 
-lalala
+Rezultati ovog studentskog rada -- implementacija dvaju algoritama opisanih u radu \cite{beller2013} koji se koriste za izračun polja najvećih zajedničkih prefiksa -- pokazali su se uspješnima, jer je ostvarena implementacija, uz ispravan rad, također pokazala i odlične performanse, koje su po memorijskom zauzeću bile tek neznatno lošije od originalne implementacije, a po vremenu izvršavanja potencijalno čak i za nijansu bolje. U tome su pripomogle i brojne optimizacije, od kojih prvenstveno valja izdvojiti vlastitu implementaciju stabla valića temeljenu na optimiziranim bitvektorima, koji za ubrzavanje upita koriste kumulativne sume i ugrađene procesorske instrukcije brojanja bitova.
 
-\newpage
+Implementirani algoritmi, koji u teoriji omogućuju konstrukciju polja najduljih zajedničkih prefiksa u složenosti $O(n \log \sigma)$, i u praksi su pokazali da im je vremenska, ali i memorijska složenost, uz konstantnu veličinu abecede linearna u ovisnosti o duljini ulaznog niza. Također, vrlo dobre performanse algoritama pokazale su da je i njihova primjena u rješavanju praktičnih problema moguća i vrlo obećavajuća.
+
+Daljnji napredak u postizanju još boljih performansi mogao bi se ostvariti na barem dvije razine -- prvo, nadogradnjom implementacije stabla valića iz običnog balansiranog u Huffmanovo ili neko slično, kao i pretvaranjem korištenih bitvektora u RRR strukture, čime bi se u oba slučaja mogla dodatno smanjiti potrošnja memorije; i drugo, analizom vremenski kritičnih operacija te redosljeda pristupa memoriji optimizirati korištenje priručne memorije i dostupnih posebnih instrukcija procesora. Također, daljni rad i analiza samih algoritama također bi mogli dovesti do otkrića nekog novog poboljšanja ili pojednostavnjenja, i time dodatno doprinijeti već i sada vrlo dobrim vremenskim i memorijskim performansama.
 
 
 \bibliography{literatura}
 \bibliographystyle{fer}
-
 
 \end{document}

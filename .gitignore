@@ -39,3 +39,4 @@ util
 tags
 gmon.out
 profiling_*.txt
+*.swp
