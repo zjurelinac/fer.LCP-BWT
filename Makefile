@@ -2,11 +2,11 @@ CXX = clang++-4.0 # g++
 
 PROFILE = false
 DEBUG = true
-OPT_LVL = 0
+OPT_LVL = 3
 
 DFLAGS = USE_FAST_BV
 DFLAGS_ = $(foreach flag,$(DFLAGS),-D$(flag))
-CFLAGS = -std=c++14 -O$(OPT_LVL) -march=native -Wall -Wextra -Wno-char-subscripts -I./src/include $(DFLAGS_)
+CFLAGS = -std=c++14 -O$(OPT_LVL) -march=native -msse4.2 -Wall -Wextra -Wno-char-subscripts -I./src/include $(DFLAGS_)
 
 ifeq ($(DEBUG), true)
 	CFLAGS += -g -DDEBUG

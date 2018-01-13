@@ -12,7 +12,7 @@
 #include <list>
 #include <utility>
 
-#define SMALLSTACK_SIZE 32
+#define SMALLSTACK_SIZE 128
 #define FASTQUEUE_START_SIZE 32
 #define FASTQUEUE_ALIGN 0xFFFFFFF0
 #define FASTQUEUE_OPT_SIZE (1 << 18)

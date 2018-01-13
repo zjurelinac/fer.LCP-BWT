@@ -14,32 +14,32 @@
 
 #include "base.hpp"
 
-//  
-//  Function that actually returns floor(log(2)x).
-//  
+//
+//  Compile-time function that returns the largest power of 2 smaller than x.
+//
 //  @param x
 //  @return floor(log(2)x)
 //
 //  Example:
 //      unsigned int x(10);
 //      unsinged int l = clog2(x);  // l = 3
-// 
+//
 constexpr unsigned int clog2(unsigned int x) {
     auto l = 0u;
     for (; (1u << l) < x; ++l);
     return l;
 }
 
-//  
-//  Function that return bit mask for clog2(x).
-//  
+//
+//  Compile-time function that return bit mask for clog2(x).
+//
 //  @param x
 //  @return 2^(clog2(x))-1
 //
 //  Example:
 //      unsigned int x(10);
 //      unsinged int m = cmodmask(x);  // m = b'111' = 7
-// 
+//
 constexpr unsigned int cmodmask(unsigned int x) {
     return (1 << clog2(x)) - 1;
 }
@@ -90,9 +90,9 @@ private:
 
 
 namespace lb {
-    //  
+    //
     //  Class implementing memory and instruction saving bitvector structure.
-    // 
+    //
     template<unsigned int bucket_size = 256>
     class fast_bitvector {
         using base_bitvector = bitvector<unsigned long long>;
@@ -129,8 +129,7 @@ namespace lb {
 
 template <typename T>
 void bitvector<T>::push_back(const bool& val) {
-    if (!bi)
-        store.push_back(0);
+    if (!bi) store.push_back(0);
     store[store.size() - 1] |= ((base_type) val) << bi;
     bi = (bi + 1) & MASK_BLOCK_SIZE;
     ++sz;

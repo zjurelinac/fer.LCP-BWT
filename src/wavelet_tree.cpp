@@ -62,32 +62,32 @@ static inline lb::size_t binary_rank(const lb::bitvector& bv, lb::bitvector::val
 //
 lb::wavelet_tree::wavelet_tree(const lb::sequence& in, const lb::alphabet& a) : a(a), sz(in.size()) {
     using subseq = std::pair<sequence::iterator, sequence::iterator>;
-    using tmp_node = std::pair<alpha_interval, subseq>;
+    using tmp_node = std::tuple<unsigned int, alpha_interval, subseq>;
 
     sequence in_copy = in;
     std::queue<tmp_node> work_queue;
-    work_queue.push(tmp_node(alpha_interval(0, a.size() - 1), subseq(in_copy.begin(), in_copy.end())));
+    work_queue.push(tmp_node(0, {0, a.size() - 1}, {in_copy.begin(), in_copy.end()}));
 
+    nodes.resize(4*a.size());
     while (!work_queue.empty()) {
         auto curr = work_queue.front(); work_queue.pop();
-        auto alpha = curr.first;
-        auto range = curr.second;
+        auto node = std::get<0>(curr);
+        auto alpha = std::get<1>(curr);
+        auto range = std::get<2>(curr);
 
         auto mid = (alpha.first + alpha.second) / 2;
         auto chr = a[(lb::size_t) mid];
 
-        bitvector bv;
         for (auto it = range.first; it != range.second; ++it)
-            bv.push_back(*it > chr);
-        nodes.push_back(bv);
+            nodes[node].push_back(*it > chr);
 
         std::stable_partition(range.first, range.second, [chr](auto x){ return x <= chr; });
         auto bound = std::upper_bound(range.first, range.second, chr);
 
         if (alpha.first < mid)
-            work_queue.push(tmp_node(alpha_interval(alpha.first, mid), subseq(range.first, bound)));
-        if (mid < alpha.second)
-            work_queue.push(tmp_node(alpha_interval(mid + 1, alpha.second), subseq(bound, range.second)));
+            work_queue.push(tmp_node(2*node + 1, {alpha.first, mid}, {range.first, bound}));
+        if (mid + 1 < alpha.second)
+            work_queue.push(tmp_node(2*node + 2, {mid + 1, alpha.second}, {bound, range.second}));
     }
 }
 
@@ -152,17 +152,17 @@ lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) cons
     const int N = nodes.size();
     int curr = 0, symbol_index = a[(symbol_type)symbol];
 
-    alpha_interval alpha = alpha_interval(0, a.size() - 1);
+    alpha_interval alpha = {0, a.size() - 1};
     while (curr < N) {
         auto mid = (alpha.first + alpha.second) / 2;
         bitvector::value_type bit = symbol_index > mid;
         index = binary_rank(nodes[curr], bit, index);
         if (!bit) {
             curr = 2*curr + 1;
-            alpha = alpha_interval(alpha.first, mid);
+            alpha = {alpha.first, mid};
         } else {
             curr = 2*curr + 2;
-            alpha = alpha_interval(mid + 1, alpha.second);
+            alpha = {mid + 1, alpha.second};
         }
     }
 
@@ -177,15 +177,19 @@ lb::size_t lb::wavelet_tree::rank(lb::size_t index, lb::symbol_type symbol) cons
 }
 
 void lb::wavelet_tree::show() const {
-    using nd = std::pair<unsigned int, unsigned int>;
-    std::queue<nd> Q;
-    Q.push(nd(0, 0));
+    using nda = std::tuple<unsigned int, unsigned int, alpha_interval>;
+    std::queue<nda> Q;
+    Q.push(nda(0, 0, {0, a.size()-1}));
     while (!Q.empty()) {
-        nd c = Q.front(); Q.pop();
-        if (c.first < nodes.size()) {
-            Q.push(nd(2*c.first + 1, c.second + 1));
-            Q.push(nd(2*c.first + 2, c.second + 1));
-            std::cout << "[" << c.first << "]:" << indent(c.second * 2) << " " << nodes[c.first];
+        nda c = Q.front(); Q.pop();
+        auto node = std::get<0>(c);
+        auto depth = std::get<1>(c);
+        auto alpha = std::get<2>(c);
+        auto m = (alpha.first + alpha.second) / 2;
+        if (node < nodes.size()) {
+            std::cout << "[" << node << "]<" << a[(size_t) alpha.first] << "," << a[(size_t) alpha.second] << ">:" << indent(depth * 2) << " " << nodes[node];
+            Q.push(nda(2*node + 1, depth + 1, {alpha.first, m}));
+            Q.push(nda(2*node + 2, depth + 1, {m+1, alpha.second}));
         }
     }
 }*/

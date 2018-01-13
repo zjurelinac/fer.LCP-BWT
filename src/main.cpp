@@ -14,10 +14,7 @@
 #include <string>
 
 #include "algorithms.hpp"
-
-#ifndef USE_SDSL_WTREE
 #include "wavelet_tree.hpp"
-#endif
 
 lb::sequence parse_input(const char* input_file);
 void output_results(const char* output_file, lb::lcp_array& LCP);
@@ -37,12 +34,12 @@ int main(int argc, char* argv[]) {
     output_results(argv[2], LCP);
 }
 
-//  
+//
 //  Function that parses input file into lb::sequence.
-//  
+//
 //  @param input_file - input file name
 //  @return parsed input file without first line + '$' on the end
-//  
+//
 //  Example:
 //      char* file_name{"data.txt"};
 //      lb::sequence s = parse_input(file_name);
@@ -65,12 +62,12 @@ lb::sequence parse_input(const char* input_file) {
     return input + '$';
 }
 
-//  
+//
 //  Function that ouputs computed LCP array to file.
-//  
+//
 //  @param output_file - output file name
 //  @param lcp - array that will be written to file
-//  
+//
 //  Example:
 //      char* file_name{"output.txt"};
 //      lb::lcp:array array{1, 2, 5, 3, 12, 9};
