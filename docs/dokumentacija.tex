@@ -8,7 +8,7 @@
 \usepackage{calc}
 \usepackage{url}
 \usepackage{hyperref}
-\hypersetup{colorlinks=true, linkcolor=blue, filecolor=black, urlcolor=blue, citecolor=black}
+\hypersetup{colorlinks=true, linkcolor=black, filecolor=black, urlcolor=black, citecolor=black}
 \usepackage{indentfirst}
 \graphicspath{ {img/} }
 
@@ -195,16 +195,13 @@ Kako bi i vremenska složenost rada sa stablom valića bila što bolja, bitvekto
 
 \subsection{Algoritmi 1 i 2}
 
-\textbf{begin Tonko}
-
-Autori u radu \cite{beller2013} koriste dva algoritma kako bi izgradili LCP polje i naš osnovni zadatak unutar ovog projekta bio je upravo implementacija tih dvaju algoritama.
-Prema prvom algoritmu koji su autori predložili, za jedan $\omega$-interval[i..j], funkcija \textit{getIntervals([i..j])} vraća listu svih \textit{c$\omega$}-intervala. To ustvari znači da se unutar intervala [i..j] pronađu svi znakovi abecede $\Sigma$, koji se potom poredaju leksikografski te se za svaki od znakova računa njegov $\omega$-interval. Na poslijetku, funkcija vraća onoliko c$\omega$ intervala koliko ima jedinstvenih znakova u intervalu [i..j].
+Prema radu \cite{beller2013} za izradu LCP polja koriste se dva algoritma čija je implementacija osnovni cilj ovog projekta. 
+Prvi algoritam za jedan $\omega$-interval[i..j] pomoću funkcije \textit{getIntervals([i..j])} vraća listu svih \textit{c$\omega$} intervala. To znači da se unutar intervala [i..j] pronađu svi znakovi abecede $\Sigma$, koji se potom poredaju leksikografski te se za svaki od znakova računa njegov $\omega$-interval. Konačno, funkcija vraća onoliko \textit{c$\omega$}-intervala koliko ima jedinstvenih znakova u intervalu [i..j].
 Postupak započinje $\omega$ intervalom [i..j] u korijenu stabla valića te se nastavlja spuštati u dubinu (kao DFS (engl. \textit{depth-first search}) algoritam).
-Dok se nalazi u trenutnom čvoru, algoritam postavlja rang upit stablu valića (složenost upita je konstantna!), kako bi došao do broja b$_{0}$ - a$_{0}$. Taj broj predstavlja nule u bit vektoru trenutnog čvora \textit{v} unutar trenutnog intervala. Ako je ta vrijednost pozitivna u BWT[i..j] se nalaze znakovi koji pripadaju lijevom podstablu čvora \textit{v} i algoritam nastavlja rekurzivno pozivanje unutar lijevog djeteta čvora \textit{v}. Isto tako, ako je broj jedinica pozitivan (b$_1$ - a$_1$), onda se algoritam nastavlja odvijati u desnoj grani. Algoritam se zaustavlja kad se za trenutni interval [p..q] dosegne list stabla koji odgovara znaku \textit{c}. Tada je c$\omega$-interval [C[c]+p..C[c]+q], gdje je C[c] zbroj rangova svih elemenata iz poredane abecede koji su leksikografski manji od znaka c. Vremenska složenost ovog postupka je $O$(\textit{k}log$\sigma$), gdje je k duljina liste c$\omega$-intervala.
+Za svaki trenutni čvor algoritam postavlja rang upit konstantne složenosti prema stablu valića kako bi došao do broja b$_{0}$ - a$_{0}$. Taj broj predstavlja nule u bit vektoru trenutnog čvora \textit{v} unutar trenutnog intervala. Ako je ta vrijednost pozitivna u BWT[i..j] se nalaze znakovi koji pripadaju lijevom podstablu čvora \textit{v} i algoritam nastavlja rekurzivno pozivanje unutar lijevog djeteta čvora \textit{v}. Isto tako, ako je broj jedinica pozitivan (b$_1$ - a$_1$), onda se algoritam nastavlja odvijati u desnoj grani. Algoritam se zaustavlja kad se za trenutni interval [p..q] dosegne list stabla koji odgovara znaku \textit{c}. Tada je c$\omega$-interval [C[c]+p..C[c]+q], gdje je C[c] zbroj rangova svih elemenata iz poredane abecede koji su leksikografski manji od znaka c. Vremenska složenost ovog postupka je $O$(\textit{k}log$\sigma$), gdje je k duljina liste c$\omega$-intervala.
 
-Kao što je već rečeno, \textbf{algoritam 2} se oslanja na algoritam 1. Svi elementi polja LCP[1..n+1] se inicijalno postavljaju na neku nemoguću vrijednost, npr. $\perp$, osim prvog i zadnjeg elementa koji poprimaju vrijednost -1. Jedan red (engl. \textit{queue}) sadržava parove (interval,\textit{l}). Na početku rada algoritma u redu se nalazi samo interval [1..n], a \textit{l} vrijednost je postavljena na 0. Algoritam potom skida iz reda interval (po principu FIFO, dok god se red ne isprazni), te pozivom metode \textit{getIntervals} prvog algoritma dobiva listu c$\omega$-intervala za dani interval. Za svaki interval [lb..rb] iz liste c$\omega$-intervala gleda se je li vrijednost polja LCP[rb+1] nepostavljena (iznosi $\perp$) te ako jest, taj interval [lb..rb] se dodaje u red, a njegova \textit{l} vrijednost se povećava za 1 u odnosu na \textit{l} vrijednost intervala koji je posljednji skinut iz reda. Također, vrijednost LCP[rb+1] se postavlja na tu posljednju \textit{l} vrijednost. 
-
-\textbf{end Tonko}
+Algoritam 2 se interno oslanja na algoritam 1. Inicijalno svi elementi polja LCP[1..n+1] se postavljaju na vrijednost  $\perp$, osim prvog i zadnjeg elementa koji su postavljeni na -1.  Jedan red (engl. \textit{queue}) sadrži parove (interval,\textit{l}).
+ Na početku rada algoritma u redu se nalazi samo interval [1..n], a \textit{l} vrijednost je postavljena na 0. Algoritam potom skida iz reda interval (po principu FIFO, dok god se red ne isprazni), te pozivom metode \textit{getIntervals} prvog algoritma dobiva listu c$\omega$-intervala za dani interval. Za svaki interval [lb..rb] iz liste c$\omega$-intervala gleda se je li vrijednost polja LCP[rb+1] nepostavljena (iznosi $\perp$) te ako jest, taj interval [lb..rb] se dodaje u red, a njegova \textit{l} vrijednost se povećava za 1 u odnosu na \textit{l} vrijednost intervala koji je posljednji skinut iz reda. Također, vrijednost LCP[rb+1] se postavlja na tu posljednju \textit{l} vrijednost. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -236,6 +233,8 @@ Kao što je već rečeno, \textbf{algoritam 2} se oslanja na algoritam 1. Svi el
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
+
+
 
 \begin{algorithm}[H]
 	\caption{iz rada \cite{beller2013}}
@@ -353,56 +352,63 @@ Potpuno izgrađeno stablo za dani primjer prikazano je na slici \ref{fig:wavelet
 		\end{center}
 	\end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsubsection{Konstrukcija polja najduljih zajedničkih prefiksa}
 
 \begin{enumerate}
 	\item Polje najduljih zajedničkih prefiksa gradi se prema Algoritmima 1 i 2 iz rada \cite{beller2013} u nekoliko koraka:
 
 	\begin{enumerate}
-		\item Vrijednosti polja LCP postavljaju se na nevažeće($\perp$), osim za $LCP[1]$ i $LCP[n+1]$, koji se postavljaju na $-1$. U red $Q$ se stavlja početni interval $I = [i..j] = [1..12]$ i duljina zajedničkog prefiksa $l = 0$:\\
+		\item Inicijalizacija LCP polja i reda Q. Vrijednosti polja LCP se postavljaju na nevažeću (\textbf{$\perp$}) vrijednost, osim LCP[1] i LCP[n+1] koji se postavljaju na -1. U red Q stavljamo strukturu koja sadrži početni interval $I = [i..j]=[1..12]$ i broj $\textit{l}=0$:\\
 	 	$$LCP = [-1,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp, -1]$$
-		$$Q = [\langle[1..12],0\rangle]$$
-
-		\item c$\omega$-intervali za prvi $\omega$-interval u redu $Q$ izračunavaju se funkcijom $getIntervals$ (Algoritam 1 iz \cite{beller2013}). Za slučaj intervala $\langle[1..12],0\rangle$, koji označava cjelukupni niz i duljinu zajedničkog prefiksa $0$, rješenje su intervali u kojima svi sufiksi (iz sufiksnog polja) počinju istim znakom, a to su:
-		$$ [[1..1],[2..5],[6..6],[7..8],[9..12]] $$
-što se može i vidjeti iz tablice \ref{tableEx2}.
-
-		\item Za svaki od dobivenih intervala $[lb..rb]$ se potom provjerava vrijednost $LCP[rb+1]$, i ako je ona jednaka $\perp$, u red se  dodaje $\langle[lb..rb],l+1\rangle$, a na indeks $rb+1$ u polju LCP zapisuje se vrijednost $l$. Za prvu iteraciju algoritma, to izgleda ovako:
-			\begin{enumerate}
-				\item $LCP = [-1,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp, -1]$,\\
-				$ Q = [\varnothing]$,\\
-				$list = [[1..1],[2..5],[6..6],[7..8],[9..12]]$\\
-				
-				$ [lb..rb] = [1..1]$\\
-						
-				$LCP[rb+1]=LCP[2]=\perp$\\
-				$\rightarrow$ u red dodajemo $\langle[1..1],1\rangle$, i postavljamo $LCP[2]=0$.
-				\newline
-						
-				\item $LCP = [-1,0,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp, -1]$,\\
-			   	$Q = [\langle[1..1],1\rangle]$,\\
-			    $list = [[2..5],[6..6],[7..8],[9..12]]$\\
-			    
-				$[lb .. rb] = [2..5]$\\
-
-				$LCP[rb+1]=LCP[6]=\perp$\\
-				$\rightarrow$ u red stavljamo $\langle[2..5],1\rangle$, i postavljamo $LCP[6]=0$.
-				\newline
-				\item $LCP = [-1,0,\perp,\perp,\perp,0,\perp,\perp,\perp,\perp,\perp, \perp, -1]$,\\
-				$Q = [\langle[1..1],1\rangle, \langle[2..5],1\rangle]$,\\
-			    $list = [[6..6],[7..8],[9..12]]$\\
-				\ldots
-			\end{enumerate}
-
-      	\item Ponavljanjem prethodno opisanih koraka konačno se odredi da je vrijednost polja najduljih zajedničkih prefiksa jednaka: 
-		$$ LCP = [-1,0,1,1,4,0,0,1,0,2,1,3,-1] $$
+		$$Q = [<[1..12],0>]$$
+		\item Izračunavanje c$\omega$-intervala za interval dobiven uzimanjem elementa iz reda Q (FIFO) unutar funkcije \textit{getIntervals} iz Algoritma 1 \cite{beller2013}.
+			\begin{itemize}
+				\item \textit{c} - znak
+				\item \textit{C[c]} - zbroj rangova svih elemenata leksikografski sortirane abecede koji su manji od c
+			    \item \textit{i} - početak intervala
+			    \item \textit{j} - kraj intervala
+			    \item Funkcija \textit{rang(a,k)} vraća broj pojavljivanja znaka \textit{a} do \textit{k}-tog indeksa u polju. 
+			    \item Znakovi abecede iz intervala $I$ se sortiraju od najmanjeg prema najvećem. Ima onoliko c$\omega$-intervala koliko je i jedinstvenih znakova. Kako je abeceda za dani primjer $\Sigma[1..5]=\$imps$, traži se 5 c$\omega$-intervala.
+			    \item $C = [0,1,5,6,8]$
+			    \item Indeks početka intervala dobiva se po formuli \textit{rang}(c,i-1)+C[c]+1 Indeks kraja intervala dobiva se po formuli C[c]+\textit{rang}(c,j).
+			    \item U intervalu $I$ se nalaze svi znakovi abecede (\$,i,m,p,s). Za svaki od znakova računa se njegov interval prema formuli navedenoj iznad.
+					  $$ [\textit{rang}('\$',0)+C['\$']+1..C['\$']+\textit{rang}('\$',12)]=[0+0+1..+0+1]=[1..1] $$
+			    	  $$ [\textit{rang}('i',0)+C['i']+1..C['i']+\textit{rang}('i',12)]=[0+1+1..+1+4]=[2..5] $$
+			    	  $$ [\textit{rang}('m',0)+C['m']+1..C['m']+\textit{rang}('m',12)]=[0+5+1..+5+1]=[6..6] $$
+			    	  $$ [\textit{rang}('p',0)+C['p']+1..C['p']+\textit{rang}('p',12)]= [0+6+1..+6+2]=[7..8] $$
+			          $$ [\textit{rang}('s',0)+C['s']+1..C['s']+\textit{rang}('s',12)]=[0+8+1..+8+4]=[9..12] $$
+			    \item Povratna vrijednost \textit{getIntervals}, prema tome, je lista c$\omega$-intervala: [[1..1],[2..5],[6..6],[7..8],[9..12]]
+				\item Za svaki od dobivenih intervala [\textit{lb .. rb}] se potom provjerava vrijednost LCP[\textit{rb}+1]. Ako je vrijednost tog polja \textbf{NULL} u red stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>], a na index \textit{rb}+1 vrijednost \textit{l}. Navedeni postupak se ponavlja sve dok u redu ima elemenata, a prva dva koraka prikazana su u nastavku.
+					\begin{enumerate}
+						\item LCP = [-1,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
+					    Q = [<[1..1],0>]
+						[\textit{lb .. rb}] = [1..1], \textit{l} = 0
+						\newline
+						LCP[\textit{rb}+1]=LCP[2]=$\perp$ -> u red Q stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>] = [<[\textit{1..1}],1>], a LCP[\textit{rb}+1]=LCP[2]=0.
+						\item LCP = [-1,0,$\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
+					   	Q = [<[2..5],0>,<[1..1],1>]
+						[\textit{lb .. rb}] = [2..5], \textit{l} = 0
+						\newline
+						LCP[\textit{rb}+1]=LCP[6]=$\perp$ -> u red Q stavljamo strukturu [<[\textit{lb..rb}],\textit{l}+1>] = [<[\textit{2..5}],1>], a LCP[\textit{rb}+1]=LCP[6]=0.
+						\item LCP = [-1,0,$\perp,\perp,\perp,$0$,\perp,\perp,\perp,\perp,\perp, \perp$, -1]
+						Q = [<[6..6],0>,<[2..5],1>,<[1..1],1>]
+						[\textit{lb .. rb}] = [6..6], \textit{l} = 0
+						\newline (...)
+					\end{enumerate}
+	  	\end{itemize}
+      	\item Vrijednost LCP polja koju dobijemo kao rezultat izvršavanja algoritma je: 
+		LCP = [-1,0,1,1,4,0,0,1,0,2,1,3,-1].
 	\end{enumerate}
 \end{enumerate}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Rezultati}
 
-Prethodno opisani algoritam uspješno je implementiran i ispitan u sklopu ovoga rada, a njegove su performanse uspoređene s originalnom implementacijom autora rada \cite{beller2013} i prošlogodišnjom studentskom implementacijom opisanom u radu \cite{studenti2017}. Svi izvorni kodovi, ispitni podaci, dokumentacija i ostale pomoćne datoteke mogu se preuzeti s web adrese: \textbf{\href{https://github.com/zjurelinac/LCP-BWT}{https://github.com/zjurelinac/LCP-BWT}}.
+Prethodno opisani algoritam uspješno je implementiran i ispitan u sklopu ovoga rada, a njegove su performanse uspoređene s originalnom implementacijom autora rada \cite{beller2013} i prošlogodišnjom studentskom implementacijom opisanom u radu \cite{studenti2017}.
 
 Točnost algoritma provjerena je na tri skupine sintetskih podataka različitih veličina abecede -- slučajno generiranim sekvencama DNA i aminokiselina, te na poznatom nasumičnom latinskom tekstu \textit{lorem ipsum}. Duljine ispitnih podataka bile su u rasponu od $20$ do $25000$ ulaznih znakova, a provjera je vršena usporedbom s točnim rješenjima određenima naivnim algoritmom koji radi u kvadratnoj složenosti.
 
