@@ -1,13 +1,18 @@
 \BOOKMARK [1][-]{section.1}{Uvod}{}% 1
 \BOOKMARK [1][-]{section.2}{Algoritmi}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Podatkovne strukture}{section.2}% 3
-\BOOKMARK [3][-]{subsubsection.2.1.1}{Sufiksno polje}{subsection.2.1}% 4
-\BOOKMARK [3][-]{subsubsection.2.1.2}{Burrows-Wheelerova transformacija \(BWT\)}{subsection.2.1}% 5
-\BOOKMARK [3][-]{subsubsection.2.1.3}{Stablo valica}{subsection.2.1}% 6
-\BOOKMARK [1][-]{section.3}{Primjer rada algoritma}{}% 7
-\BOOKMARK [2][-]{subsection.3.1}{Izgradnja sufiksnog polja}{section.3}% 8
-\BOOKMARK [2][-]{subsection.3.2}{Burrows-Wheelerova transformacija}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.3}{Izgradnja LCP niza}{section.3}% 10
-\BOOKMARK [1][-]{section.4}{Rezultati}{}% 11
-\BOOKMARK [1][-]{section.5}{Zakljucak}{}% 12
-\BOOKMARK [1][-]{section.6}{Literatura}{}% 13
+\BOOKMARK [2][-]{subsection.2.1}{Sufiksno polje}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Burrows-Wheelerova transformacija \(BWT\)}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Stablo valica}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Algoritmi 1 i 2}{section.2}% 6
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Algoritam 1}{subsection.2.4}% 7
+\BOOKMARK [3][-]{subsubsection.2.4.2}{Algoritam 2}{subsection.2.4}% 8
+\BOOKMARK [2][-]{subsection.2.5}{Primjer rada algoritma}{section.2}% 9
+\BOOKMARK [3][-]{subsubsection.2.5.1}{Izgradnja sufiksnog polja}{subsection.2.5}% 10
+\BOOKMARK [3][-]{subsubsection.2.5.2}{Burrows-Wheelerova transformacija}{subsection.2.5}% 11
+\BOOKMARK [3][-]{subsubsection.2.5.3}{Izgradnja stabla valica}{subsection.2.5}% 12
+\BOOKMARK [3][-]{subsubsection.2.5.4}{Konstrukcija polja najduljih zajednickih prefiksa}{subsection.2.5}% 13
+\BOOKMARK [1][-]{section.3}{Rezultati}{}% 14
+\BOOKMARK [2][-]{subsection.3.1}{Usporedba trajanja izvoenja}{section.3}% 15
+\BOOKMARK [2][-]{subsection.3.2}{Usporedba zauzeca memorije}{section.3}% 16
+\BOOKMARK [1][-]{section.4}{Zakljucak}{}% 17
+\BOOKMARK [1][-]{section.5}{Literatura}{}% 18
