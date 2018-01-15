@@ -163,21 +163,40 @@ $$
 
 \newpage
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \subsection{Stablo valića}
-\textbf{TODO:Correct all!}
-Stablo valića je struktura podataka koja rekurzivno particionira tok u 2 dijela sve dok su u svakom dijelu preostali homogeni podatci. Ime stabla je analogno valnoj transformaciji signala koji rekurzivno dekompresira signal prema frenkvencijama komponenti. 
+Stablo valića je sažeta struktura podataka koja omogućava komprimirano pohranjivanje nizova znakova u obliku stabla, i podržava upite tipa \texttt{rank} i \texttt{select}, koji omogućavaju učinkovito pretraživanje ulaznog niza unatrag u složenosti $O(\log\sigma)$ po koraku ($\sigma$ je veličina abecede). Ova struktura nazvana je stablom valića jer se temelji na principu sličnome tzv. transformaciji valićima iz područja obrade signala, a radi na način da rekurzivno razdjeljuje ulazni niz na dva dijela, od kojih se u prvom nalaze samo znakovi iz prve polovice trenutne abecede, a u drugome svi iz ostatka.
 
-Stablo valića može efikasno raditi upite rank i select nad nizovima proizvoljnih abeceda. To nam omogućuje pretraživanje unatrag u vremenskoj složenosti od  $O(\log\sigma)$ po koraku.
-Prvo definiramo uzlazno poredanu abecedu $\eta$ kao niz znakova veličine $\sigma $.  
-Zatim definiramo interval [1..r] kao podinterval abecede, r <= $\sigma$
-Za interval [1..r], niz znakova BWT[1..r] dobijemo tako da iz transformiranog niza znakova od S uklonimo sve znakove iz B-W transformacije koji ne pripadaju segmentu abecede [1..r]. Stablo valića niza znakova BWT izgrađeno nad abecedom $\eta$[1..$sigma$] je balansirano binarno stablo pretraživanja. Stablo se sastoji od čvorova, a svaki čvor v odgovara nizu znakova $BWT^{[l..r]}$, gdje je [l..r] abecedni interval. Korijen stabla odgovara nizu znakova BWT = $BWT^{[1..\sigma]}$. Ako je l=r, onda taj čvor $v$ nema djece. Inače, svaki čvor $v$ ima dvoje djece: lijevo dijete koje odgovara nizu znakova $BWT^{[l..m]}$, i desno dijete odgovara nizu znakova $BWT^{[m+1..r]}$, gdje je $\left \lceil{\frac{l+r}{2}}\right \rceil$. U ovom slučaju $v$ sadrži bit vektor $B^{[l..r]}$, čiji je i-ti element 0 ako je i-ti znak u $BWT^{[l..r]}]$ iz pod- abecede $\eta$[1..m], a 1 ako je iz pod abecede $\eta$[m+1..r]. Drugim riječima, ako traženi znak pripada lijevom podstablu, element bit vektora je 0, a ako pripada desnom podstablu, onda je element bit vektora 1. Za svaki vektor B potrebno je napraviti predprocesiranje na način da se upiti $rank_0(B,i)$ i $rank_1(B,i)$ mogu odgovoriti u konstantnom vremenu, gdje $rank_b(B,i)$ predstavlja broj pojavljivanja bita $b$ u B[1..i]. Stablo valića ima visinu $O(log\sigma)$. S obzirom da je u implementaciji dovoljno spremiti samo bit vektore, stablo valića zahtijeva samo nlog $\sigma$ bitova prostora i $O(n*log\sigma)$ bitova za podatkovne strukture koje podržavaju rang upite u konstantnom vremenu.  
+Konkretno, stablo valića konstruira se na sljedeći način:
+\begin{enumerate}
+	\item Na temelju svih znakova prisutnih u ulaznom nizu odredi se njegova uzlazno poredana abeceda $\Sigma$ (veličine $|\Sigma| = \sigma$), i svakom se pripadnom znaku dodijeli njegov indeks u intervalu $[1..\sigma]$. 
+	
+	\item Počevši od cjelokupne abecede i ulaznog niza, stablo valića gradi se tako da se u svakom koraku trenutna abeceda (koja je podinterval početne abecede $\Sigma$ i pripada sadašnjem čvoru -- korijenu pripada cijela abeceda) podijeli na dvije polovice ($\Sigma[l..r] \rightarrow \Sigma_L[l..m] + \Sigma_R[(m+1)..r]$, gdje je $m = \frac{l+r}{2}$), te se trenutni niz $S$ razdijeli na dva, tako da svi znakovi koji pripadaju abecedi $\Sigma_L$ postanu dio niza $S_L$, a svi iz $\Sigma_R$ niza $S_R$. Sadašnjem se čvoru pridjeljuje niz bitova $B$ duljine jednake duljini trenutnog niza $S$, gdje je
+	
+	$$
+	B_i =
+	\begin{cases}
+	0, & ako\ S_i \in S_L,\ tj.\ ako\ S_i \in \Sigma_L \\
+	1, & ako\ S_i \in S_R,\ tj.\ ako\ S_i \in \Sigma_R \\
+	\end{cases}
+	$$
+	
+	Konstrukcija se potom rekurzivno nastavlja razmatranjem dvaju novih čvorova $L$ i $R$ (s pripadnim abecedama $\Sigma_L$ i $\Sigma_R$ te nizovima $S_L$ i $S_R$) koji će biti djeca sadašnjeg čvora.
+	
+	\item Kada se u konstrukciji dosegne čvor čija je abeceda oblika $\Sigma = [l..l]$, taj se čvor dalje ne razdjeljuje, već on postaje jednim od listova u stablu valića (a često se u konkretnoj implementaciji i uklanja, te pamti samo implicitno).
+	
+	\item Kada više nema niti jednog čvora u stablu koji bi se mogao razdijeliti, konstrukcija je gotova, i stablo valića je izgrađeno.
+\end{enumerate}
+
+Dubina ovako konstruiranog stabla valića je $O(\log\sigma)$, a s obzirom da se u svakom čvoru pohranjuju samo bitvektori, prostorna složenost stabla valića je $O(n\log\sigma)$.
+
+Kako bi i vremenska složenost rada sa stablom valića bila što bolja, bitvektori u kojima su pohranjene vrijednosti nizova $B$ uz same bitove pohranjuju i manju količinu dodatnih informacija (dovoljno malu da ne utječe na prostornu složenost) koja im omogućuje da u vremenu $O(1)$ odgovaraju na tzv. binarne rang-upite, koji traže koliko je bitova $0$ ili $1$ prisutno u bitvektoru u nekom intervalu $[0..i]$. Na taj način cjelokupno stablo valića na njemu bitne \texttt{rank} i \texttt{select} upite može odgovarati u složenosti $O(\log\sigma)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Algoritmi 1 i 2}
-\textbf{TODO:Correct all!}
+
+\textbf{begin Tonko}
+
 Autori u radu \cite{beller2013} koriste dva algoritma kako bi izgradili LCP polje i naš osnovni zadatak unutar ovog projekta bio je upravo implementacija tih dvaju algoritama.
 Prema prvom algoritmu koji su autori predložili, za jedan $\omega$-interval[i..j], funkcija \textit{getIntervals([i..j])} vraća listu svih \textit{c$\omega$}-intervala. To ustvari znači da se unutar intervala [i..j] pronađu svi znakovi abecede $\Sigma$, koji se potom poredaju leksikografski te se za svaki od znakova računa njegov $\omega$-interval. Na poslijetku, funkcija vraća onoliko c$\omega$ intervala koliko ima jedinstvenih znakova u intervalu [i..j].
 Postupak započinje $\omega$ intervalom [i..j] u korijenu stabla valića te se nastavlja spuštati u dubinu (kao DFS (engl. \textit{depth-first search}) algoritam).
@@ -185,29 +204,33 @@ Dok se nalazi u trenutnom čvoru, algoritam postavlja rang upit stablu valića (
 
 Kao što je već rečeno, \textbf{algoritam 2} se oslanja na algoritam 1. Svi elementi polja LCP[1..n+1] se inicijalno postavljaju na neku nemoguću vrijednost, npr. $\perp$, osim prvog i zadnjeg elementa koji poprimaju vrijednost -1. Jedan red (engl. \textit{queue}) sadržava parove (interval,\textit{l}). Na početku rada algoritma u redu se nalazi samo interval [1..n], a \textit{l} vrijednost je postavljena na 0. Algoritam potom skida iz reda interval (po principu FIFO, dok god se red ne isprazni), te pozivom metode \textit{getIntervals} prvog algoritma dobiva listu c$\omega$-intervala za dani interval. Za svaki interval [lb..rb] iz liste c$\omega$-intervala gleda se je li vrijednost polja LCP[rb+1] nepostavljena (iznosi $\perp$) te ako jest, taj interval [lb..rb] se dodaje u red, a njegova \textit{l} vrijednost se povećava za 1 u odnosu na \textit{l} vrijednost intervala koji je posljednji skinut iz reda. Također, vrijednost LCP[rb+1] se postavlja na tu posljednju \textit{l} vrijednost. 
 
+\textbf{end Tonko}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{algorithm}[H]
-	\caption{prema \cite{beller2013}}
+	\caption{iz rada \cite{beller2013}}
 	\label{alg1}
 	\begin{algorithmic}
 		\Function{getIntervals}{[i..j]}
 			\State $list \gets$ []
-			\State getIntervals'([i..j],[1..$\sigma$],list)
+			\State $getIntervals'([i..j],[1..\sigma],list)$
 			\State \Return $list$
-		\EndFunction
+		\EndFunction\\
 
 		\Function{getIntervals'}{[i..j],[l..r],list}
 			\If {$l = r$}
 				\State $c \gets \Sigma[l]$
-				\State $add(list, [C[c]+i..C[c]+j)$ 
+				\State $list.add([C[c]+i..C[c]+j)$
 			\Else
 				\State $(a_0,b_0) \gets (rank_0(B^{[l..r]},i-1),rank_0(B^{[l..r]},j))$
 				\State $(a_1,b_1) \gets (i-1-a_0,j-b_0)$
 				\State $m \gets \lfloor\frac{l+r}{2}\rfloor$ 
 				\If {$b_0 > a_0$}
-					\State \textit{getIntervals'}([a$_0$+1..b$_0$],[l..m],list)
+					\State $getIntervals'([a_0+1..b_0],[l..m],list)$
 				\EndIf
 				\If{$b_1 > a_1$}
-					\State \textit{getIntervals'}([a$_1$+1...b$_1$],[m+1..r],list)
+					\State $getIntervals'([a_1+1...b_1],[m+1..r],list)$
 				\EndIf
 			\EndIf
 		\EndFunction
@@ -217,20 +240,19 @@ Kao što je već rečeno, \textbf{algoritam 2} se oslanja na algoritam 1. Svi el
 
 
 \begin{algorithm}[H]
-	\caption{prema \cite{beller2013}}
+	\caption{iz rada \cite{beller2013}}
 	\label{alg2}
 	\begin{algorithmic}
-		\State inicijalizacija polja LCP[1..n+1]  /* npr. LCP[i]=$\perp$ za sve $1 \leq i \leq n+1$ */
-		\State LCP[1] $\gets$ -1; LCP[n+1] $\gets$ -1
-		\State inicijaliziraj prazni red
-		\State dodaj (<[1..n],0>) u red q
-		\While{q nije prazan}
-			\State <[i..j],$l$> $\gets q.pop()$
-			\State list $\gets$ \textit{getIntervals}([i..j])
-			\For{\textbf{each}\texttt{[lb..rb] \textbf{in} \textit{list}}}
-				\If{LCP[rb+1]=$\perp$}
-					\State $q.push(<[lb..rb],l+1>)$
-					\State LCP[rb+1] $\gets l$
+		\State $LCP[1] \gets -1;\ LCP[n+1] \gets -1;\ LCP[i] \gets \perp,\ \forall i \in [2..n]$
+		\State $Q = [\varnothing]$ /* prazan red */
+		\State $Q.push(\langle[1..n]\rangle, 0)$
+		\While{\textbf{not} Q.empty}
+			\State $\langle[i..j], l\rangle \gets Q.pop()$
+			\State $list \gets \textit{getIntervals}([i..j])$
+			\For{\textbf{each} $[lb..rb]$ \textbf{in} $list$}
+				\If{$LCP[rb+1]=\perp$}
+					\State $Q.push(\langle[lb..rb],l+1\rangle)$
+					\State $LCP[rb+1] \gets l$
 				\EndIf
 			\EndFor
 		\EndWhile
@@ -238,16 +260,14 @@ Kao što je već rečeno, \textbf{algoritam 2} se oslanja na algoritam 1. Svi el
 \end{algorithm}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \subsection{Primjer rada algoritma}
 U nastavku je dan primjer rada algoritma na stringu S = mississippi.
 
 \subsubsection{Izgradnja sufiksnog polja}
 
 \begin{enumerate}
-	\item Na kraj ulaznog niza dodaje se znak \$ te je sada S =  mississippi\$. U daljnjem tekstu vrijedi pretpostavka da je znak \$ abecedno manji od svih ostalih znakova od kojih je S izrađen.
-	\item Svakom sufiksu niza S pridružuju se indeksi od 1 do \textit{n}, počevši od najduljeg. Ovo je prikazano u \textbf{tablici \ref{tableEx1}}
+	\item Na kraj ulaznog niza dodaje se znak \$ te je sada $S =  mississippi\$$. U daljnjem tekstu vrijedi pretpostavka da je znak \$ abecedno manji od svih ostalih znakova od kojih je $S$ izrađen.
+	\item Svakom sufiksu niza $S$ pridružuju se indeksi od 1 do \textit{n}, počevši od najduljeg. Ovo je prikazano u \textbf{tablici \ref{tableEx1}}.
 
 	\begin{table}[h!]
 		\caption{Pridruživanje indeksa sufiksima niza S}
@@ -274,30 +294,29 @@ U nastavku je dan primjer rada algoritma na stringu S = mississippi.
 		\end{center}
 	\end{table}
 
-	\item Sufiksno polje \(SA\) dobivamo soritiranjem dobivenih sufiksa leksikografski od najmanjeg prema najvećem. Ovo je prikazano u \textbf{tablici \ref{tableEx2}}.
-
-	Dobiveno je sufiksno polje SA = [12, 11, 8, 5, 2, 1, 10, 9, 7, 4, 6, 3]
+	\item Sufiksno polje $SA$ dobivamo soritiranjem svih sufiksa leksikografski od najmanjeg prema najvećem. To je prikazano u \textbf{tablici \ref{tableEx2}}. Rezultat je sufiksno polje:
+	$$SA = [12, 11, 8, 5, 2, 1, 10, 9, 7, 4, 6, 3]$$
 
 	\begin{table}[h!]
-		\caption{\textbf{TODO: Correct!}Sufiksi su poredani leksikografski, a njihovi indeksi čine sufiksno polje SA.}
-		\label{tablePrimjer3}
+		\caption{Sufiksno polje ulaznog niza, kao i njegova Burrows-Wheelerova transformacija}
+		\label{tableEx2}
 		\begin{center}
-			\begin{tabular}{rrl}
+			\begin{tabular}{rrll}
 				\toprule
-				i & SA[i] & S$_{SA}$[i] \\
+				i & SA[i] & S$_{SA}$[i] & BWT[i] \\
 				\midrule
-				1 & 12 & \$ \\
-				2 & 11 &  i\$ \\
-				3 & 8 & ippi\$ \\
-				4 & 5 & issippi\$ \\
-				5 & 2 & ississippi\$ \\
-				6 & 1 & misssissippi\$ \\
-				7 & 10 & pi\$ \\
-				8 & 9 & ppi\$ \\
-				9 & 7 & sippi\$ \\
-				10 & 4 & sissippi\$ \\
-				11 & 6 & ssippi\$ \\
-				12 & 3 & ssissippi\$ \\
+				1 & 12 & \$ & i \\
+				2 & 11 &  i\$ & p \\
+				3 & 8 & ippi\$ & s \\
+				4 & 5 & issippi\$ & s \\
+				5 & 2 & ississippi\$ & m \\
+				6 & 1 & misssissippi\$ & \$ \\
+				7 & 10 & pi\$ & p \\
+				8 & 9 & ppi\$ & i \\
+				9 & 7 & sippi\$ & s \\
+				10 & 4 & sissippi\$ & s \\
+				11 & 6 & ssippi\$ & i \\
+				12 & 3 & ssissippi\$ & i \\
 				\bottomrule
 			\end{tabular}
 		\end{center}
@@ -306,51 +325,43 @@ U nastavku je dan primjer rada algoritma na stringu S = mississippi.
 
 \subsubsection{Burrows-Wheelerova transformacija}
 
-Izračunava se Burrows-Wheelerova transformacija BWT[1..n] za dobiveno sufiksno polje SA prema prethodno navedenoj formuli.
-Npr. $$BWT[4]=S[SA[4]-1]=S[5-1]=S[4]=s.$$
+Na temelju izračunatog sufiksnog polja provodi se Burrows-Wheelerova transformacija nad ulaznim nizom prema prethodno navedenoj formuli. Rezultat transformacije je $BWT = ipssm\$pissii$.
 
-Rezultat je prikazan u tablici \ref{tableEx3}. 
+\subsubsection{Izgradnja stabla valića}
 
-\begin{table}[h!]
-	\caption{Burrows-Wheelerova tranformacija}
-	\label{tableEx3}
-	\begin{center}
-		\begin{tabular}{rrll}
-			\toprule
-			i & SA[i] & S$_{SA}$[i] & BWT[i] \\
-			\midrule
-			1 & 12 & \$ & i \\
-			2 & 11 &  i\$ & p \\
-			3 & 8 & ippi\$ & s \\
-			4 & 5 & issippi\$ & s \\
-			5 & 2 & ississippi\$ & m \\
-			6 & 1 & misssissippi\$ & \$ \\
-			7 & 10 & pi\$ & p \\
-			8 & 9 & ppi\$ & i \\
-			9 & 7 & sippi\$ & s \\
-			10 & 4 & sissippi\$ & s \\
-			11 & 6 & ssippi\$ & i \\
-			12 & 3 & ssissippi\$ & i \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
-\end{table}
-
-\subsubsection{Izgradnja LCP niza}
-\textbf{TODO: Correct!}
+Iz dobivene Burrows-Wheelerove transformacije gradi se stablo valića na sljedeći način:
 \begin{enumerate}
-	\item Iz dobivene Burrows-Wheelerove transformacije gradi se stablo valića. Prvo se stvara sortirana abeceda ulaznog niza koja je u ovom slučaju veličine 5 znakova ($\Sigma$[1..5]=\$imps). Korijen stabla čini bit vektor dobiven kodiranjem niza Burrows-Wheelerove transformacije dobivene u prethodnom koraku. Abeceda se potom dijeli na pola te dobivamo dva podniza, ovom slučaju: $\Sigma$[1..2]=\$i i $\Sigma$[3..5]=mps. Znakovi prve polovice u svakoj skupini kodiraju se vrijednošću 0, a ostali 1. Postupak se ponavlja sve dok se u čvoru ne nalaze samo jednaki znakovi koji čine listove stabla. Potpuno izgrađeno stablo za dani primjer prikazano je na slici \ref{fig:waveletTree}.
+	\item Prvo se stvara sortirana abeceda ulaznog niza koja je jednaka $\Sigma=\$imps$.
 
-	\begin{figure}
+	\item Pri izgradnji korijena stabla, abeceda se dijeli na dva dijela, $\Sigma_L = \$im$ i $\Sigma_R = ps$. Potom se određuje niz $B$, koji je jednak $011100101100$, te se ulazni niz $S = ipssm\$pissii$ razdjeljuje na $S_L = im\$iii$ i $S_R = psspss$.
+	
+	\item Lijevo dijete korijena, kojemu pripada abeceda $\Sigma = \$im$ i niz $S = im\$iii$, gradi se tako da se abeceda podijeli na $\Sigma_L = \$i$ i $\Sigma_R = m$, odredi vektor $B = 010000$, te niz podijeli na $S_L = i\$iii$ i $S_R = m$.
+	
+	\item Novonastalo lijevo dijete se potom gradi tako da se njegova abeceda $\Sigma = \$i$ podijeli na $\Sigma_L = \$$ i $\Sigma_R = i$, niz $S = i\$iii$ na $S_L = \$$ i $S_R = iiii$, te mu se pridruži bitvektor $B = 10111$.
+	
+	\item Desno dijete korijena, s pripadnom abecedom $\Sigma = ps$, gradi se tako da se abeceda razdijeli na $\Sigma_L = p$ i $\Sigma_R = s$, pripadni niz $S = psspss$ na $S_L = pp$ i $S_R = ssss$, te se čvoru dodijeli niz $B = 011011$.
+	
+	\item Svi preostali čvorovi, budući da imaju abecedu od samo jednog znaka, postaju listovima stabla, te konstrukcija stabla valića time završava.
+
+\end{enumerate}
+	
+Potpuno izgrađeno stablo za dani primjer prikazano je na slici \ref{fig:waveletTree}.
+
+	\begin{figure}[h!]
 		\begin{center}
 			\includegraphics[width=\columnwidth]{waveletTree.png}
-			\caption{Stablo valića za dani primjer}
+			\caption{Stablo valića za navedeni primjer}
 			\label{fig:waveletTree}
 		\end{center}
 	\end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	\item Pomoću Algoritama 1 i 2 iz rada \cite{beller2013} gradi se polje najdužih zajedničkih prefiksa (LCP) u nekoliko koraka:
+\subsubsection{Konstrukcija polja najduljih zajedničkih prefiksa}
+
+\begin{enumerate}
+	\item Polje najduljih zajedničkih prefiksa gradi se prema Algoritmima 1 i 2 iz rada \cite{beller2013} u nekoliko koraka:
+
 	\begin{enumerate}
 		\item Inicijalizacija LCP polja i reda Q. Vrijednosti polja LCP se postavljaju na nevažeću (\textbf{$\perp$}) vrijednost, osim LCP[1] i LCP[n+1] koji se postavljaju na -1. U red Q stavljamo strukturu koja sadrži početni interval $I = [i..j]=[1..12]$ i broj $\textit{l}=0$:\\
 	 	$$LCP = [-1,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp,\perp, \perp, -1]$$
