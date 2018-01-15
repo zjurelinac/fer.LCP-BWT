@@ -1,5 +1,6 @@
 # LCP-BWT
 _Computing the LCP array based on BWT_
+
 [Bioinformatics course](http://www.fer.unizg.hr/predmet/bio) project at **FER, University of Zagreb**
 
 ## Installation
